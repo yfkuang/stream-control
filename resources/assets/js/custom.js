@@ -1,4 +1,6 @@
-//Firebase Auth
+/*--------------
+//Firebase Authorization
+--------------*/
 //Require Dependencies. Placed here or undefined variable errors otherwise.
 var firebase = require('firebase/app');
 require('firebase/auth');
@@ -60,6 +62,7 @@ $(document).ready(function(){//Initialize Event Listeners
 	});
 	
 	$('.logout').click(function(){
+		console.log('test');
 		logout();
 	});
 	

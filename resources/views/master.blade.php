@@ -9,9 +9,14 @@
         <title>Overlee Stream Control | @yield('title')</title>
     </head>
     <body>
-        @yield('content')
+		<div class="container">
+        	@yield('content')
+		</div><!--.container-->
+		
 		<footer>
-			<p>&copy; Overlee Stream Control by Ye Fang Kuang.</p>
+			<div class="container">
+				<p>&copy; Overlee Stream Control by Ye Fang Kuang.</p>
+			</div>
 		</footer>
 	</body>
 </html>

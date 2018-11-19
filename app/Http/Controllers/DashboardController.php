@@ -8,7 +8,7 @@ class DashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
-		/*$token = session('token');
+		$token = session('token');
 		
 		if(!$token){
 			return redirect()->route('index');
@@ -22,7 +22,7 @@ class DashboardController extends Controller
 			];
 
 			return response()->view('dashboard', $context);
-		}*/
+		}
 		
 		return response()->view('dashboard');
     }

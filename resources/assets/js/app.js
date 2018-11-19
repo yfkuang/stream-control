@@ -8,7 +8,6 @@
 window.$ = window.jQuery = require('jquery');//Hack to prevent jQuery errors on custom Bootstrap functions
 //window.Popper = require('popper.js');//Don't remember why this was included
 require('bootstrap');
-require('./ajax.js');
 require('./custom.js');
 
 //window.Vue = require('vue');

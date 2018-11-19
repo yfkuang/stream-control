@@ -15,7 +15,7 @@ class FirebaseController extends Controller
 		if($request->input('tokenID') != null){
 			if($request->input('tokenID') == 'logout'){
 				$request->session()->forget('token');
-				return response()->view('firebase.index',['uid' => null, 'token' => null]);
+				return response()->view('login',['uid' => null, 'token' => null]);
 			} else {
 				$token = $request->input('tokenID');
 			}
@@ -24,20 +24,20 @@ class FirebaseController extends Controller
 		}
 		
 		if(!$token){
-			return response()->view('firebase.index',['uid' => null, 'token' => null]);
+			return response()->view('login',['uid' => null, 'token' => null]);
 		} else {
 			$uid = FirebaseController::verifyToken($token);
 			session(['token' => $token]);
 			
 			if(User::where('firebase_id', '=', $uid)->exists()){
-				return redirect()->action('LeadController@dashboard');
+				return redirect()->action('Dashboard@dashboard');
 			} else {
 				$user = new User();
 				$user->firebase_id = $uid;
 				
 				$user->save();
 				
-				return redirect()->action('LeadController@dashboard');
+				return redirect()->action('Dashboard@dashboard');
 			}
 		}
 	}
@@ -55,7 +55,7 @@ class FirebaseController extends Controller
 		try {
 			$verifiedIdToken = $firebase->getAuth()->verifyIdToken($idTokenString);
 		} catch (InvalidToken $e) {
-			return response()->view('firebase.index');
+			return response()->view('login');
 		}
 
 		$uid = $verifiedIdToken->getClaim('sub');
