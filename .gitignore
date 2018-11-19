@@ -4,4 +4,5 @@
 _notes/
 /bower_components/
 /node_modules/
+/app/Http/Controllers/firebasesdk/
 .env

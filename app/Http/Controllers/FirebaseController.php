@@ -30,20 +30,20 @@ class FirebaseController extends Controller
 			session(['token' => $token]);
 			
 			if(User::where('firebase_id', '=', $uid)->exists()){
-				return redirect()->action('Dashboard@dashboard');
+				return redirect()->action('DashboardController@dashboard');
 			} else {
 				$user = new User();
 				$user->firebase_id = $uid;
 				
 				$user->save();
 				
-				return redirect()->action('Dashboard@dashboard');
+				return redirect()->action('DashboardController@dashboard');
 			}
 		}
 	}
 	
 	public static function verifyToken($token){
-		$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/'.env("FIREBASE_JSON"));
+		$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/firebasesdk/'.env("FIREBASE_JSON"));
 
 		$firebase = (new Factory)
 			->withServiceAccount($serviceAccount)

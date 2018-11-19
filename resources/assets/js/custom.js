@@ -62,7 +62,6 @@ $(document).ready(function(){//Initialize Event Listeners
 	});
 	
 	$('.logout').click(function(){
-		console.log('test');
 		logout();
 	});
 	
