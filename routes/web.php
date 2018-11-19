@@ -11,6 +11,30 @@
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
-});
+});*/
+
+/*Route::get(
+    '/',
+	['as' => 'index',
+     'uses' => 'FirebaseController@login'
+    ]
+);
+
+Route::post(
+    '/',
+	['as' => 'login',
+     'uses' => 'FirebaseController@login'
+    ]
+);*/
+
+Route::get(
+    'dashboard',
+    ['as' => 'dashboard',
+     'uses' => 'DashboardController@dashboard'
+    ]
+);
+
+/*Firebase SDK*/
+Route::get('/phpfirebase_sdk','FirebaseController@index');

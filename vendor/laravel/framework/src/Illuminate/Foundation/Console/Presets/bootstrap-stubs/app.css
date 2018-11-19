@@ -4,7 +4,7 @@ Error: File to import not found or unreadable: node_modules/bootstrap-sass/asset
          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/bourbon
          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/neat
          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/base
-        on line 9 of D:\xampp\htdocs\Stream Control\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss
+        on line 9 of C:\xampp\htdocs\StreamControl\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss
 
 4: 
 5: // Variables
@@ -14,7 +14,7 @@ Error: File to import not found or unreadable: node_modules/bootstrap-sass/asset
 9: @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 Backtrace:
-D:\xampp\htdocs\Stream Control\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss:9
+C:\xampp\htdocs\StreamControl\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss:9
 C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/ruby/lib/ruby/gems/2.4.0/gems/sass-3.5.3/lib/sass/tree/import_node.rb:67:in `rescue in import'
 C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/ruby/lib/ruby/gems/2.4.0/gems/sass-3.5.3/lib/sass/tree/import_node.rb:45:in `import'
 C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/ruby/lib/ruby/gems/2.4.0/gems/sass-3.5.3/lib/sass/tree/import_node.rb:28:in `imported_file'
@@ -51,4 +51,4 @@ C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/ruby/bin/sass:23:in `<main>'
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: File to import not found or unreadable: node_modules/bootstrap-sass/assets/stylesheets/bootstrap.\A        Load paths:\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/bourbon\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/neat\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/base\A         on line 9 of D:\xampp\htdocs\Stream Control\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss\A \A 4: \A 5: // Variables\A 6: @import \"variables\";\A 7: \A 8: // Bootstrap\A 9: @import \"node_modules/bootstrap-sass/assets/stylesheets/bootstrap\";"; }
+  content: "Error: File to import not found or unreadable: node_modules/bootstrap-sass/assets/stylesheets/bootstrap.\A        Load paths:\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/bourbon\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/neat\A          C:/Program Files/Adobe/Adobe Dreamweaver CC 2018/Configuration/SassFrameworks/base\A         on line 9 of C:\xampp\htdocs\StreamControl\vendor\laravel\framework\src\Illuminate\Foundation\Console\Presets\bootstrap-stubs\app.scss\A \A 4: \A 5: // Variables\A 6: @import \"variables\";\A 7: \A 8: // Bootstrap\A 9: @import \"node_modules/bootstrap-sass/assets/stylesheets/bootstrap\";"; }
