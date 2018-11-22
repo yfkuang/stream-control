@@ -14,7 +14,6 @@ class DashboardController extends Controller
 			return redirect()->route('index');
 		} else {
 			$uid = FirebaseController::verifyToken($token);
-			$user = User::where('firebase_id', '=', $uid)->first();
 		
 			$context = [
 				'uid' => $uid,

@@ -4,6 +4,7 @@
 //Require Dependencies. Placed here or undefined variable errors otherwise.
 var firebase = require('firebase/app');
 require('firebase/auth');
+require('firebase/firestore');
 
 function login (){
 	var userEmail = $('input[name=email]').val();
@@ -14,7 +15,7 @@ function login (){
 	  	var errorCode = error.code;
 	  	var errorMessage = error.message;
 	  	// ...
-		console.log('noboi');
+		console.log('Login info is incorrect');
 	});
 	
 	firebase.auth().onAuthStateChanged(function(user) {
@@ -22,13 +23,24 @@ function login (){
 			// User is signed in.
 			firebase.auth().currentUser.getIdToken().then(function (response){
 				$('input[name="tokenID"]').val(response);
+				var dbUser = firebase.firestore().collection('users').doc(user.uid);
+				dbUser.get().then(function(doc) {
+					if (doc.exists) {
+						console.log("Pre-existing User");
+					} else {
+						// Creates new user
+						firebase.firestore().collection('users').doc(user.uid).set({email: user.email});//Set user to Firestore
+						console.log("New User");
+					}
+				}).catch(function(error) {
+					console.log("Error getting document:", error);
+				});
 				$('.login-form').submit();
 				//console.log(response);
 			});
-			
 	  } else {
 		// No user is signed in.
-		console.log('noboii');
+		console.log('Login failed');
 	  }
 	});
 }

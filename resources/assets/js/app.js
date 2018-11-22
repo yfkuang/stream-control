@@ -8,7 +8,7 @@
 window.$ = window.jQuery = require('jquery');//Hack to prevent jQuery errors on custom Bootstrap functions
 //window.Popper = require('popper.js');//Don't remember why this was included
 require('bootstrap');
-require('./custom.js');
+require('./firebase-auth.js');
 
 //window.Vue = require('vue');
 

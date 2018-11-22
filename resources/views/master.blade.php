@@ -9,6 +9,17 @@
         <title>Overlee Stream Control | @yield('title')</title>
     </head>
     <body>
+		<header>
+			<div class="container">
+				@if($uid)
+				<ul class="nav navbar-nav">
+					<!-- <li><a href="{{ route('dashboard') }}">Dashboard</a></li> -->
+					<li>{{ Form::open(['route' => 'login', 'method' => 'POST', 'class' => 'logout-form']) }}{!! Form::hidden('tokenID') !!}{!! Form::button('Logout', ['class' => 'btn btn-primary logout']) !!}{{ Form::close() }}</li>
+				</ul>
+				@endif
+			</div><!-- .container -->
+		</header>
+		
 		<div class="container">
         	@yield('content')
 		</div><!--.container-->

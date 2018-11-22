@@ -29,7 +29,7 @@ class FirebaseController extends Controller
 			$uid = FirebaseController::verifyToken($token);
 			session(['token' => $token]);
 			
-			if(User::where('firebase_id', '=', $uid)->exists()){
+			/*if(User::where('firebase_id', '=', $uid)->exists()){
 				return redirect()->action('DashboardController@dashboard');
 			} else {
 				$user = new User();
@@ -38,7 +38,9 @@ class FirebaseController extends Controller
 				$user->save();
 				
 				return redirect()->action('DashboardController@dashboard');
-			}
+			}*/
+			
+			return redirect()->action('DashboardController@dashboard');
 		}
 	}
 	
