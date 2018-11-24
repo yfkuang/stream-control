@@ -1,2 +1,50 @@
 /* Scss Document */
 
+/*--------------
+//Header
+--------------*/
+header{
+	padding: 20px 0 20px 0;
+	border-bottom: 1px solid #acacac;
+}
+
+/*--------------
+//Footer
+--------------*/
+footer{
+	padding: 20px 0 20px 0;
+}
+
+/*--------------
+//Content
+--------------*/
+section.content {
+	padding: 40px 0 40px 0;
+}
+
+.overlay{
+	box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+	padding: 20px;
+	margin-bottom: 50px;
+	border-radius: 2px;
+	background: #ffffff;
+}
+
+.overlay-name{
+	cursor: pointer;
+	display: inline-block;
+	padding: 3px;
+	border-radius: 2px;
+	
+	transition-duration: 0.1s;
+}
+
+.overlay-name:hover{
+	background-color: #cdcdcd;
+	
+	transition-duration: 0.1s;
+}
+
+.post-overlays{
+	text-align: center;
+}

@@ -5,10 +5,29 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+/*Firebase Initialization*/
+global.firebase = require('firebase/app');
+require('firebase/auth');
+require('firebase/firestore');
+
+$(document).ready(function(){
+	var firebaseConfig = {
+		apiKey: process.env.MIX_FIREBASE_API,
+		authDomain: process.env.MIX_FIREBASE_AUTH_DOMAIN,
+		databaseURL: process.env.MIX_FIREBASE_DATABASE_URI,
+		projectId: process.env.MIX_FIREBASE_PROJECT_ID,
+		storageBucket: process.env.MIX_FIREBASE_STORAGE_BUCKET,
+		messagingSenderId: process.env.MIX_FIREBASE_MESSAGING_SENDER_ID
+	};
+	firebase.initializeApp(firebaseConfig);
+});
+
 window.$ = window.jQuery = require('jquery');//Hack to prevent jQuery errors on custom Bootstrap functions
 //window.Popper = require('popper.js');//Don't remember why this was included
 require('bootstrap');
 require('./firebase-auth.js');
+//require('./modules.js');
+require('./overlays.js');
 
 //window.Vue = require('vue');
 

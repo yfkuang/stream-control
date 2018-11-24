@@ -2,11 +2,13 @@
 <html lang="{{ app()->getLocale() }}">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+		<meta name="uid" data="{{ $uid }}">
+		<meta name="token" data="{{ $token }}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-        <title>Overlee Stream Control | @yield('title')</title>
+		<title>Overlee Stream Control | @yield('title')</title>
     </head>
     <body>
 		<header>
@@ -20,9 +22,11 @@
 			</div><!-- .container -->
 		</header>
 		
-		<div class="container">
-        	@yield('content')
-		</div><!--.container-->
+		<section class="content">
+			<div class="container">
+				@yield('content')
+			</div><!--.container-->
+		</section>
 		
 		<footer>
 			<div class="container">

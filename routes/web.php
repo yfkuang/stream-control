@@ -11,10 +11,6 @@
 |
 */
 
-/*Route::get('/', function () {
-    return view('welcome');
-});*/
-
 Route::get(
     '/',
 	['as' => 'index',
@@ -35,3 +31,7 @@ Route::get(
      'uses' => 'DashboardController@dashboard'
     ]
 );
+
+/*--------------
+//Ajax
+--------------*/

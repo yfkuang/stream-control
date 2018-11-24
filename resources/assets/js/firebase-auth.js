@@ -1,10 +1,7 @@
 /*--------------
 //Firebase Authorization
 --------------*/
-//Require Dependencies. Placed here or undefined variable errors otherwise.
-var firebase = require('firebase/app');
-require('firebase/auth');
-require('firebase/firestore');
+var token = $('meta[name="token"]').attr('data');
 
 function login (){
 	var userEmail = $('input[name=email]').val();
@@ -55,19 +52,19 @@ function logout(){
 
 $(document).ready(function(){//Initialize Event Listeners
 	
-	/*--------------
-	//Firebase Client-side authentication
-	--------------*/
-	// Initialize Firebase
-	var config = {
-		apiKey: process.env.MIX_FIREBASE_API,
-		authDomain: process.env.MIX_FIREBASE_AUTH_DOMAIN,
-		databaseURL: process.env.MIX_FIREBASE_DATABASE_URI,
-		projectId: process.env.MIX_FIREBASE_PROJECT_ID,
-		storageBucket: process.env.MIX_FIREBASE_STORAGE_BUCKET,
-		messagingSenderId: process.env.MIX_FIREBASE_MESSAGING_SENDER_ID
-	};
-	firebase.initializeApp(config);
+	firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			firebase.auth().currentUser.getIdToken().then(function (response){//Keep user from getting timed out
+				$('meta[name="token"]').val(response);
+
+				//console.log(response);
+			}).catch(function(error){
+				console.log('Could not retrieve token ID.');
+			});
+		} else {
+			logout();
+		}
+	});
 	
 	$('.login').click(function(){
 		login();
