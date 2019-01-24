@@ -1,18 +1,24 @@
 /*--------------
 //Modules
 --------------*/
-function addModule(){
-	
-}
+var uid = $('meta[name="uid"]').attr('data');
+//var overlayid = ;
+
+
+
+
 
 $(document).ready(function(){//Initialize Event Listeners
 	
+	
+	
 	/*--------------
-	//Bootstrap Modal Window
+	//Realtime Event Listener
 	--------------*/
-	$('.add-module').click(function(){
-		console.log('module!');
+	firebase.firestore().collection('users').doc(uid).collection("overlays").onSnapshot(function(querySnapshot) {
+		$('.overlay').remove();
+		querySnapshot.forEach(function(doc){
+			displayModule(doc.data());
+		});
 	});
-	
-	
 });

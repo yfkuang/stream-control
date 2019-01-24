@@ -7,9 +7,10 @@
 @section('content')
 	<div>
 		{{ Form::open(['route' => 'login', 'method' => 'POST', 'class' => 'login-form']) }}
-			{!! Form::text('email', '', ['placeholder' => 'Email']) !!}
+			<h2 style="text-align: center;">Login</h2>
+			{!! Form::text('email', '', ['placeholder' => 'Email']) !!}<br>
 			{!! Form::password('password',['placeholder' => 'Password']) !!}
-			{!! Form::hidden('tokenID') !!}
+			{!! Form::hidden('tokenID') !!}<br>
 			{!! Form::button('Login', ['class' => 'btn btn-primary login']) !!}
 		{{ Form::close() }}
 	</div>

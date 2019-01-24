@@ -70,6 +70,12 @@ $(document).ready(function(){//Initialize Event Listeners
 		login();
 	});
 	
+	$('.login-form').on('keypress',function(e) {
+		if(e.which == 13) {
+			login();
+		}
+	});
+	
 	$('.logout').click(function(){
 		logout();
 	});

@@ -1,8 +1,13 @@
 /*--------------
-//Pages
+//Overlays
 --------------*/
+
+/*Retrieve user ID*/
 var uid = $('meta[name="uid"]').attr('data');
 
+/*--------------
+//General Functions
+--------------*/
 function makeid() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -14,6 +19,35 @@ function makeid() {
   return text;
 }
 
+/*--------------
+//Module Functions
+--------------*/
+function addModule(overlayid, type){
+	console.log('New module added:' + overlayid + ' ' + type);
+	
+	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).set({
+		type: type,
+	});
+
+}
+
+function displayModule(data){
+	console.log(data);
+	/*firebase.firestore().collection('users').doc(uid).collection('overlays').doc(data).collection('modules').get().then(function(doc) {
+    	if (doc.exists) {
+			console.log("Module data:", doc.data());
+    	} else {
+        	// doc.data() will be undefined in this case
+			console.log("No modules!");
+    	}
+	}).catch(function(error) {
+		console.log("Error getting modules:", error);
+	});*/
+}
+
+/*--------------
+//Overlay Functions
+--------------*/
 function addOverlay(){
 	console.log('New overlay added');
 	var newOverlay = makeid();
@@ -38,9 +72,12 @@ function displayOverlay(data){
 						  	'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
 						  	'<h3 class="overlay-name">' + data.name + '</h3>' +
 						  	'<p><b>Overlay Link:</b> <a href="control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a></p>' +
-						  	'<button class="btn btn-primary add-module" type="button"><i class="fas fa-plus-circle"></i> Add Module</button>' +
+						  	'<div class="modules"></div>' +
+						  	'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
 						  	'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
 						  '</div>');
+	
+	displayModule(data);
 	
 	//Add event handler to elements created by Javascript
 	$('.overlays').find('.remove-overlay').each(function(i){
@@ -68,12 +105,34 @@ function displayOverlay(data){
 			$(this).remove();
 		});
 	});
+	
+	$('.overlays').find('.add-module').each(function(i){
+		$(this).click(function(e){
+			var overlayid = $(this).parent().children('.overlay-id').val();
+			
+			$('#add-module').modal();
+			
+			$('.module-button').attr('data-overlayid', overlayid);
+			
+			
+		});
+	});
 }
 
+/*--------------
+//Event Listeners
+--------------*/
 $(document).ready(function(){//Initialize Event Listeners
 	
 	$('.add-overlay').click(function(){
 		addOverlay();
+	});
+	
+	$('.module-button').click(function(){
+		var type = $(this).attr('data-type');
+		var overlayid = $(this).attr('data-overlayid');
+	
+		addModule(overlayid,type);
 	});
 	
 	/*--------------
