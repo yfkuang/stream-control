@@ -26,7 +26,8 @@ window.$ = window.jQuery = require('jquery');//Hack to prevent jQuery errors on 
 //window.Popper = require('popper.js');//Don't remember why this was included
 require('bootstrap');
 require('./firebase-auth.js');
-require('./overlays.js');
+require('./dashboard.js');
+require('./overlay.js');
 //require('./modules.js');
 
 //window.Vue = require('vue');

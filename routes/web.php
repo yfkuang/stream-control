@@ -32,6 +32,15 @@ Route::get(
     ]
 );
 
+
 /*--------------
 //Ajax
 --------------*/
+
+/*--------------
+//Dynamic URLs
+--------------*/
+// Catch all page controller (place at the very bottom)
+Route::get('{slug}', [
+    'uses' => 'OverlayController@getOverlay' 
+])->where('slug', '([A-Za-z0-9\-\/]+)');

@@ -21,6 +21,11 @@ header{
 	border-bottom: 1px solid #acacac;
 }
 
+.navbar-nav{
+	flex-direction: row;
+	justify-content: space-between;
+}
+
 /*--------------
 //Footer
 --------------*/
@@ -35,6 +40,7 @@ section.content {
 	padding: 40px 0 40px 0;
 }
 
+//Overlays
 .overlay{
 	box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
 	padding: 20px;
@@ -62,6 +68,15 @@ section.content {
 	text-align: center;
 }
 
+//Modules
+.module{
+	padding: 20px;
+	border: 1px solid #898989;
+}
+
+.module h4{
+	text-transform: capitalize;
+}
 
 
 /*--------------

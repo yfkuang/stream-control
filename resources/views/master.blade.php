@@ -17,6 +17,7 @@
 				<ul class="nav navbar-nav">
 					<!-- <li><a href="{{ route('dashboard') }}">Dashboard</a></li> -->
 					<li>{{ Form::open(['route' => 'login', 'method' => 'POST', 'class' => 'logout-form']) }}{!! Form::hidden('tokenID') !!}{!! Form::button('Logout', ['class' => 'btn btn-primary logout']) !!}{{ Form::close() }}</li>
+					<li>{!! Form::button('Update', ['class' => 'btn btn-primary update']) !!}</li>
 				</ul>
 				@endif
 			</div><!-- .container -->
