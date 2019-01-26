@@ -25,24 +25,36 @@ function makeid() {
 function addModule(overlayid, type){
 	console.log('New module added:' + overlayid + ' ' + type);
 	
+	// Write new Module to overlay's 'modules' collection
 	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).set({
 		type: type,
 	});
 
 }
 
-function displayModule(data){
-	console.log(data);
-	/*firebase.firestore().collection('users').doc(uid).collection('overlays').doc(data).collection('modules').get().then(function(doc) {
-    	if (doc.exists) {
-			console.log("Module data:", doc.data());
-    	} else {
-        	// doc.data() will be undefined in this case
-			console.log("No modules!");
-    	}
+function displayModule(overlayID, overlayName){
+	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').get().then(function(querySnapshot) {
+		querySnapshot.forEach(function(doc){
+			if (doc.exists) {
+				console.log(overlayName + "module data:", doc.data());
+
+				switch(doc.data().type){
+
+					case 'versus':
+						$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append('<p>versus</p>');
+						break;
+				}
+
+			} else {
+				// doc.data() will be undefined in this case
+				console.log("No modules!");
+			}
+		});
 	}).catch(function(error) {
 		console.log("Error getting modules:", error);
-	});*/
+	});
+	
+	
 }
 
 /*--------------
@@ -77,7 +89,7 @@ function displayOverlay(data){
 						  	'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
 						  '</div>');
 	
-	displayModule(data);
+	displayModule(data.id);
 	
 	//Add event handler to elements created by Javascript
 	$('.overlays').find('.remove-overlay').each(function(i){
@@ -86,10 +98,14 @@ function displayOverlay(data){
 		});
 	});
 	
+	//Function to rename overlays
 	$('.overlays').find('.overlay-name').each(function(i){
 		$(this).click(function(e){
-			$(this).before('<input name="overlay-rename-title" type="text" value="' + $(this).text() + '"><button class="btn btn-basic overlay-rename-title"><i class="fas fa-check"></i></button>');
+			var oldName = $(this).text();
 			
+			$(this).before('<input name="overlay-rename-title" type="text" value="' + oldName + '"><button class="btn btn-basic overlay-rename-title"><i class="fas fa-check"></i></button>');
+			
+			//Rename overlay
 			$(this).parent().find('.overlay-rename-title').each(function(i){
 				$(this).click(function(){
 					firebase.firestore().collection("users").doc(uid).collection("overlays").doc($(this).parent().children('.overlay-id').val()).update({
@@ -102,10 +118,13 @@ function displayOverlay(data){
 				});
 			});
 			
+			
 			$(this).remove();
 		});
 	});
 	
+	
+	//Add event listener to add module
 	$('.overlays').find('.add-module').each(function(i){
 		$(this).click(function(e){
 			var overlayid = $(this).parent().children('.overlay-id').val();
