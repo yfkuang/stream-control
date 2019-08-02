@@ -27,6 +27,7 @@ class FirebaseController extends Controller
 			return response()->view('login',['uid' => null, 'token' => null]);
 		} else {
 			$uid = FirebaseController::verifyToken($token);
+			
 			session(['token' => $token]);
 			
 			/*if(User::where('firebase_id', '=', $uid)->exists()){
@@ -53,10 +54,10 @@ class FirebaseController extends Controller
 		$auth = $firebase->getAuth();
 		
 		$idTokenString = $token;
-
+		
 		try {
 			$verifiedIdToken = $firebase->getAuth()->verifyIdToken($idTokenString);
-		} catch (InvalidToken $e) {
+		} catch (Firebase\Auth\Token\Exception\ExpiredToken $e) {
 			return response()->view('login');
 		}
 

@@ -45,6 +45,7 @@
 						{{Form::button('<i class="fas fa-headset"></i> Casters', ['class' => 'btn btn-default col-xs-4 module-button add-casters', 'data-type' => 'casters', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="fas fa-align-left"></i> Lower-Thirds', ['class' => 'btn btn-default module-button col-xs-4 add-lower-thirds', 'data-type' => 'lower-thirds', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="far fa-clock"></i> Timer', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'timer', 'data-dismiss' => 'modal'])}}
+						{{Form::button('<i class="fas fa-chart-bar"></i> Chart', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'chart', 'data-dismiss' => 'modal'])}}
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

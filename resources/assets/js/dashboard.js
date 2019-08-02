@@ -117,7 +117,6 @@ function addOverlay(){
 	console.log('New overlay added');
 	var newOverlay = makeid();
 	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(newOverlay).set({
-		id: newOverlay,
 		name: "New Overlay"
 	});
 }
@@ -133,9 +132,11 @@ function removeOverlay(overlayid){
 }
 
 function displayOverlay(data){
-	$('.overlays').append('<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + data.name + '">' +
+	var dataName = data._document.data.internalValue.root.value.internalValue;
+	
+	$('.overlays').append('<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
 						  	'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
-						  	'<h3 class="overlay-name">' + data.name + '</h3>' +
+						  	'<h3 class="overlay-name">' + dataName + '</h3>' +
 						  	'<p><b>Overlay Link:</b> <a href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a></p>' +
 						  	'<div class="modules"></div>' +
 						  	'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
@@ -143,7 +144,23 @@ function displayOverlay(data){
 						  '</div>');
 	
 	//Add and listen to modules
-	displayModule(data.id, data.name);
+	//Overlays
+	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(snapshot => {
+		let changes = snapshot.docChanges();
+		//console.log(changes);
+		changes.forEach(change =>{
+			//console.log(change.doc.data());
+			if(change.type == 'added'){
+				displayModule(data.id, data.name);
+				//console.log(change.doc);
+			} else if (change.type == 'removed'){
+				$('.module[data-type='+ change.doc.id +']').remove();
+			} else if (change.type == 'modified'){
+				$('.module[data-type='+ change.doc.id +']').remove();
+				displayModule(change.doc);
+			}
+		});
+	});
 	/*firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(function(querySnapshot) {
 		$('.module').remove();
 		querySnapshot.forEach(function(doc){
@@ -172,6 +189,7 @@ function displayOverlay(data){
 						name: $(this).parent().children('input[name="overlay-rename-title"]').val()
 					}).then(function() {
 						console.log("Overlay renamed!");
+						
 					}).catch(function(error) {
 						console.error("Error modifing title: ", error);
 					});
@@ -224,11 +242,22 @@ $(document).ready(function(){//Initialize Event Listeners
 	/*--------------
 	//Realtime Event Listener
 	--------------*/
-
-	firebase.firestore().collection('users').doc(uid).collection("overlays").onSnapshot(function(querySnapshot) {
-		$('.overlay').remove();
-		querySnapshot.forEach(function(doc){
-			displayOverlay(doc.data());
+	
+	//Overlays
+	firebase.firestore().collection('users').doc(uid).collection("overlays").onSnapshot(snapshot => {
+		let changes = snapshot.docChanges();
+		//console.log(changes);
+		changes.forEach(change =>{
+			//console.log(change.doc.data());
+			if(change.type == 'added'){
+				displayOverlay(change.doc);
+				//console.log(change.doc);
+			} else if (change.type == 'removed'){
+				$('.overlay[data-overlayid='+ change.doc.id +']').remove();
+			} else if (change.type == 'modified'){
+				$('.overlay[data-overlayid='+ change.doc.id +']').remove();
+				displayOverlay(change.doc);
+			}
 		});
 	});
 });

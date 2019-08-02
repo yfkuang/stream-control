@@ -4,13 +4,7 @@
 var uid = $('meta[name="uid"]').attr('data');
 //var overlayid = ;
 
-
-
-
-
 $(document).ready(function(){//Initialize Event Listeners
-	
-	
 	
 	/*--------------
 	//Realtime Event Listener

@@ -14,7 +14,6 @@ $("overlay-program").ready(function(){//Initialize Event Listeners
 	/*--------------
 	//Realtime Event Listener
 	--------------*/
-
 	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayid).collection("modules").doc('versus').collection('elements').onSnapshot(function(querySnapshot) {
 		querySnapshot.forEach(function(doc){
 			$('body').append(
