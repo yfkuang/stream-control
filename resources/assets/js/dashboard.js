@@ -21,11 +21,10 @@ function makeid() {
 
 //Update goddamn everything
 function update(){
-	console.log("Overlay updated!");
+	console.log("Overlays updated!");
 	
 	$('.overlay').each(function(){
 		var overlayid = $(this).children('.overlay-id').val();
-		console.log("Updating" + overlayid);
 		
 		$('.module').each(function(){
 			var type = $(this).data('type');
@@ -33,10 +32,10 @@ function update(){
 			switch (type) {
 				
 				case 'versus'://Versus
-					console.log("Updating" + overlayid + " " + type);
-					firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).set({
-						type: type,
-						playerLeftTag: $('.playerLeftTag').val(),
+					console.log("Updating " + overlayid + " " + type);
+					firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).collection('elements').doc('playerLeftTag').set({
+						DOMelement: "playerLeftTag",
+						value: $('.playerLeftTag').val(),
 					}); //Player Left
 					break;
 
@@ -74,20 +73,21 @@ function displayModule(overlayID, overlayName){
 	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').get().then(function(querySnapshot) {
 		querySnapshot.forEach(function(doc){
 			if (doc.exists) {
-				console.log(overlayName + " module data:", doc.data());
-
+				console.log(overlayName + " module data:", doc.data());			
+				
 				switch(doc.data().type){
-
+						
 					case 'versus'://Versus
-						$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-							'<div class="module" data-type="' + doc.data().type + '">' +
+						 $('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+							 '<div class="module" data-type="' + doc.data().type + '">' +
 								'<h4>' + doc.data().type + '</h4>' +
 								'<div class="playerLeft">' +
 									'<input type="text" class="playerLeftTag" placeholder="Player Left">' +
 								'</div>' +
-								'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i> Remove Module</button>' +
-							'</div>'
-						);
+							 '<input type="hidden" class="module-content-end">' +
+							 '<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i> Remove Module</button>' +
+							'</div>');
+						
 						break;
 				}
 				
