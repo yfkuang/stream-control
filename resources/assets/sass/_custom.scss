@@ -20,6 +20,8 @@ header{
 	padding: 20px 0 20px 0;
 	border-bottom: 1px solid #acacac;
 	position: fixed;
+	width: 100%;
+	background: #fff;
 }
 
 .navbar-nav{
@@ -38,7 +40,7 @@ footer{
 //Content
 --------------*/
 section.content {
-	padding: 40px 0 40px 0;
+	padding: 100px 0 40px 0;
 }
 
 //Overlays

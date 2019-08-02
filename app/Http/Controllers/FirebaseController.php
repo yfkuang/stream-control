@@ -57,8 +57,9 @@ class FirebaseController extends Controller
 		
 		try {
 			$verifiedIdToken = $firebase->getAuth()->verifyIdToken($idTokenString);
-		} catch (Firebase\Auth\Token\Exception\ExpiredToken $e) {
-			return response()->view('login');
+		} catch (\Exception $e) {
+			session()->forget('token');
+			return response()->view('login',['uid' => null, 'token' => null]);
 		}
 
 		$uid = $verifiedIdToken->getClaim('sub');

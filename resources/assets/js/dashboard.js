@@ -75,18 +75,35 @@ function displayModule(overlayID, overlayName){
 			if (doc.exists) {
 				console.log(overlayName + " module data:", doc.data());			
 				
+				$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+					'<div class="module" data-type="' + doc.data().type + '">' +
+						'<h4>' + doc.data().type + '</h4>' +
+						'<input type="hidden" class="module-content-end">' +
+						'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i>&nbsp;Remove Module</button>' +
+					'</div>');
+					
 				switch(doc.data().type){
 						
 					case 'versus'://Versus
-						 $('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-							 '<div class="module" data-type="' + doc.data().type + '">' +
-								'<h4>' + doc.data().type + '</h4>' +
-								'<div class="playerLeft">' +
-									'<input type="text" class="playerLeftTag" placeholder="Player Left">' +
-								'</div>' +
-							 '<input type="hidden" class="module-content-end">' +
-							 '<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i> Remove Module</button>' +
-							'</div>');
+						
+						$('.module h4').after(
+							'<input name="game" list="games-list" placeholder="Select a game">' +
+							'<datalist id="games-list">' +
+								'<option value="Super Smash Bros. Melee">' +
+							'</datalist>'
+						);
+						
+						//if(doc.data())
+						
+						$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+							'<select >' +
+								'<option disabled>Select a game</option>' +
+								'<option>Super Smash Bros. Melee</option>' +
+							'</select>'
+						);
+						
+						
+							 
 						
 						break;
 				}

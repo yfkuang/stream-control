@@ -14,11 +14,16 @@ $("overlay-program").ready(function(){//Initialize Event Listeners
 	/*--------------
 	//Realtime Event Listener
 	--------------*/
-	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayid).collection("modules").doc('versus').collection('elements').onSnapshot(function(querySnapshot) {
-		querySnapshot.forEach(function(doc){
-			$('body').append(
-				'<h1>Helldddo World</h1>'
-			);
+	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayid).collection("modules").onSnapshot(snapshot => {
+		let changes = snapshot.docChanges();
+		//console.log(changes);
+		changes.forEach(change =>{
+			//console.log(change.doc.data());
+			if(change.type == 'added'){
+				console.log(change.doc);
+			} else if (change.type == 'modified'){
+				console.log(change.doc);
+			}
 		});
 	});
 });
