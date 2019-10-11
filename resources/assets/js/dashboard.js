@@ -19,120 +19,105 @@ function makeid() {
   return text;
 }
 
-//Update goddamn everything
+//Update all inputs
 function update(){
-	console.log("Overlays updated!");
 	
-	$('.overlay').each(function(){
-		var overlayid = $(this).children('.overlay-id').val();
+	$('input.updateable').each(function(){
+		var overlayid = $(this).parents('.overlay').data('overlayid');
+		var moduleid = $(this).parent().data('moduleid');
+		var element = $(this).attr('name');
 		
-		$('.module').each(function(){
-			var type = $(this).data('type');
-			
-			switch (type) {
-				
-				case 'versus'://Versus
-					console.log("Updating " + overlayid + " " + type);
-					firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).collection('elements').doc('playerLeftTag').set({
-						DOMelement: "playerLeftTag",
-						value: $('.playerLeftTag').val(),
-					}); //Player Left
-					break;
-
-
-			//Casters
-			}
+		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).set({
+				value: $(this).val(),
+		}).then(function(){
+			console.log(overlayid + " " + moduleid + " " + element + " updated!");
 		});
-	});
+	});	
 }
 
 /*--------------
 //Module Functions
 --------------*/
 function addModule(overlayid, overlayName, type){
-	console.log('New module added:' + overlayid + ' ' + overlayName + ' ' + type);
+	var newModule = makeid() + '-' + type;
+	console.log('New module added to ' + overlayid + ' (' + overlayName + '): ' + newModule);
 	
 	// Write new Module to overlay's 'modules' collection
-	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(type).set({
+	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(newModule).set({
 		type: type,
 	});
 
 }
 
-function removeModule(overlayid,moduleType){
-	firebase.firestore().collection("users").doc(uid).collection("overlays").doc(overlayid).collection('modules').doc(moduleType).delete().then(function() {
-		console.log("Module deleted!");
+function removeModule(overlayid,moduleID){
+	firebase.firestore().collection("users").doc(uid).collection("overlays").doc(overlayid).collection('modules').doc(moduleID).delete().then(function() {
+		console.log(moduleID + " deleted!");
 	}).catch(function(error) {
-		console.error("Error removing document: ", error);
+		console.error("Error removing document" + moduleID + ": ", error);
 	});
-	
-	/*Add delete modules afterwards*/
 }
 
-function displayModule(overlayID, overlayName){
-	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').get().then(function(querySnapshot) {
-		querySnapshot.forEach(function(doc){
-			if (doc.exists) {
-				console.log(overlayName + " module data:", doc.data());			
-				
-				$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-					'<div class="module" data-type="' + doc.data().type + '">' +
-						'<h4>' + doc.data().type + '</h4>' +
-						'<input type="hidden" class="module-content-end">' +
-						'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i>&nbsp;Remove Module</button>' +
-					'</div>');
-					
-				switch(doc.data().type){
-						
-					case 'versus'://Versus
-						
-						$('.module h4').after(
-							'<input name="game" list="games-list" placeholder="Select a game">' +
-							'<datalist id="games-list">' +
-								'<option value="Super Smash Bros. Melee">' +
-							'</datalist>'
-						);
-						
-						//if(doc.data())
-						
-						$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-							'<select >' +
-								'<option disabled>Select a game</option>' +
-								'<option>Super Smash Bros. Melee</option>' +
-							'</select>'
-						);
-						
-						
-							 
-						
-						break;
-				}
-				
-				//Add event handler to remove module
-				$('.modules').find('.remove-module').each(function(i){
-					$(this).click(function(e){
-						removeModule($(this).parent().parent().parent().children('.overlay-id').val(), $(this).parent().data("type"));
-					});
-				});
+function displayModule(overlayID, doc){
+	if (doc.exists) {
+		console.log(doc.id);			
 
-			} else {
-				// doc.data() will be undefined in this case
-				console.log("No modules!");
-			}
+		$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+			'<div class="module" data-moduleid="' + doc.id + '" data-type="' + doc.data().type + '">' +
+				'<h4>' + doc.data().type + '</h4>' +
+				'<input type="hidden" class="module-content-end"><br>' +
+				'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i>&nbsp;Remove Module</button>' +
+				'<br class="clear">' +
+			'</div>');
+
+		switch(doc.data().type){
+
+			case 'versus'://Versus
+
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<input class="updateable full-width" name="game" list="games-list" placeholder="Select a game">' +
+					'<datalist id="games-list">' +
+						'<option value="Super Smash Bros. Melee Singles">' +
+						'<option value="Super Smash Bros. Melee Doubles">' +
+					'</datalist>'
+				);
+
+				//if(doc.data())
+
+				$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+
+				);
+
+				break;
+
+			case 'lower-thirds'://Lower-Thirds
+
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<input class="updateable full-width" type="text" name="upperl3d" placeholder="Upper Lower-Third">' +
+					'<input class="updateable full-width" type="text" name="lowerl3d" placeholder="Lower Lower-Third">'
+				);
+
+				break;
+		}
+
+		//Add event handler to remove module
+		$('.modules').find('.remove-module').each(function(i){
+			$(this).click(function(e){
+				removeModule($(this).parent().parent().parent().children('.overlay-id').val(), $(this).parent().data("moduleid"));
+			});
 		});
-	}).catch(function(error) {
-		console.log("Error getting modules:", error);
-	});
-	
-	
+
+	} else {
+		// doc.data() will be undefined in this case
+		console.log("No modules!");
+	}	
 }
 
 /*--------------
 //Overlay Functions
 --------------*/
 function addOverlay(){
-	console.log('New overlay added');
 	var newOverlay = makeid();
+	console.log('New overlay added: ' + newOverlay);
 	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(newOverlay).set({
 		name: "New Overlay"
 	});
@@ -140,9 +125,9 @@ function addOverlay(){
 
 function removeOverlay(overlayid){
 	firebase.firestore().collection("users").doc(uid).collection("overlays").doc(overlayid).delete().then(function() {
-		console.log("Overlay deleted!");
+		console.log("Overlay " + overlayid + " deleted!");
 	}).catch(function(error) {
-		console.error("Error removing document: ", error);
+		console.error("Error removing overlay" + overlayid + ": ", error);
 	});
 	
 	/*Add delete modules afterwards*/
@@ -151,39 +136,34 @@ function removeOverlay(overlayid){
 function displayOverlay(data){
 	var dataName = data._document.data.internalValue.root.value.internalValue;
 	
-	$('.overlays').append('<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
-						  	'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
-						  	'<h3 class="overlay-name">' + dataName + '</h3>' +
-						  	'<p><b>Overlay Link:</b> <a href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a></p>' +
-						  	'<div class="modules"></div>' +
-						  	'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
-						  	'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
-						  '</div>');
+	$('.overlays').append(
+		'<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
+			'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
+			'<h3 class="overlay-name">' + dataName + '</h3>' +
+			'<p><b>Overlay Link:</b> <a href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a></p>' +
+			'<div class="modules"></div>' +
+			'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
+			'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
+			'<br class="clear">' +
+		'</div>');
 	
 	//Add and listen to modules
-	//Overlays
 	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(snapshot => {
 		let changes = snapshot.docChanges();
 		//console.log(changes);
 		changes.forEach(change =>{
 			//console.log(change.doc.data());
 			if(change.type == 'added'){
-				displayModule(data.id, data.name);
-				//console.log(change.doc);
+				displayModule(data.id, change.doc);
+				console.log(change.doc);
 			} else if (change.type == 'removed'){
-				$('.module[data-type='+ change.doc.id +']').remove();
+				$('.module[data-moduleid='+ change.doc.id +']').remove();
 			} else if (change.type == 'modified'){
-				$('.module[data-type='+ change.doc.id +']').remove();
-				displayModule(change.doc);
+				$('.module[data-moduleid='+ change.doc.id +']').remove();
+				displayModule(data.id, change.doc);
 			}
 		});
 	});
-	/*firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(function(querySnapshot) {
-		$('.module').remove();
-		querySnapshot.forEach(function(doc){
-			displayModule(doc.data().id);
-		});
-	});*/
 	
 	//Add event handler to elements created by Javascript
 	$('.overlays').find('.remove-overlay').each(function(i){

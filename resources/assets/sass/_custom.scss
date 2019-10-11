@@ -1,6 +1,15 @@
 /* Scss Document */
 
 /*--------------
+//Layout
+--------------*/
+@media (min-width: 576px) and (max-width: 991px){
+	.container {
+    	max-width: none;
+	}
+}
+
+/*--------------
 //Form
 --------------*/
 button{
@@ -12,7 +21,6 @@ input[type=text], input[type=password]{
 	padding: 5px;
 	font-size: 16pt;
 }
-
 /*--------------
 //Header
 --------------*/
@@ -37,7 +45,7 @@ footer{
 }
 
 /*--------------
-//Content
+//Dashboard
 --------------*/
 section.content {
 	padding: 100px 0 40px 0;
@@ -75,11 +83,26 @@ section.content {
 .module{
 	padding: 20px;
 	border: 1px solid #898989;
+	margin: 0 0 20px 0;
 }
 
 .module h4{
 	text-transform: capitalize;
 }
+
+.remove-overlay, .remove-module{
+	float: right;
+}
+
+a {
+	overflow-wrap: break-word;
+}
+
+.full-width{
+	width: 100%;
+}
+
+//Lower-Thirds
 
 
 /*--------------
@@ -100,4 +123,11 @@ section.content {
 	margin-left: auto;
 	margin-right: auto;
 	display: block;
+}
+
+/*--------------
+//Misc
+--------------*/
+.clear{
+	clear: both;
 }
