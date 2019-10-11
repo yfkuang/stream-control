@@ -59,7 +59,7 @@ function removeModule(overlayid,moduleID){
 
 function displayModule(overlayID, doc){
 	if (doc.exists) {
-		console.log(doc.id);			
+		//console.log(doc.data);			
 
 		$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
 			'<div class="module" data-moduleid="' + doc.id + '" data-type="' + doc.data().type + '">' +
@@ -93,16 +93,70 @@ function displayModule(overlayID, doc){
 
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
 					'<input class="updateable full-width" type="text" name="upperl3d" placeholder="Upper Lower-Third">' +
-					'<input class="updateable full-width" type="text" name="lowerl3d" placeholder="Lower Lower-Third">'
+					'<input class="updateable full-width" type="text" name="lowerl3d" placeholder="Lower Lower-Third">' +
+					'<button class="btn takel3d" type="button"><i class="fas fa-camera"></i> Take Overlay</button>'
 				);
+				
+				/*firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).once("status").then(function(snapshot){
+					var status = snapshot.val();
+					console.log(status);
+				});*/
+				
+				if(doc.data().status == undefined || doc.data().status == false){
+					$('.takel3d').removeClass("btn-warning");
+				} else if (doc.data().status == true){
+					$('.takel3d').addClass("btn-warning");
+				}
+				
+				//Take lower-third function
+				
+				
+				$('.takel3d').click(function(){
+					if(doc.data().status == undefined || doc.data().status == false){
+						firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).update({
+							status: true,
+						}).then(function(){
+							console.log(overlayID + " " + doc.id + " lower-third taken!");
+						});
+					} else if (doc.data().status == true){
+						firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).update({
+							status: false,
+						}).then(function(){
+							console.log(overlayID + " " + doc.id + " lower-third off!");
+						});
+					}
+				});
 
 				break;
 		}
 
+		doc.ref.collection("elements").get().then(function(elements){
+			elements.docs.forEach(function(element){
+				if(element.exists){
+					//console.log(element.id + ": " + element.data().value);
+					$('.module[data-moduleid=' + doc.id + '] input.updateable[name=' + element.id + ']').each(function(){
+						
+						switch($(this).attr('name')){
+						
+							default:
+							   $(this).val(element.data().value);
+							   
+							   break;
+						}
+						
+						console.log(doc.id + ", " + $(this).attr('name') + ", " + $(this).val());
+					});
+				}
+			});
+		});
+		
 		//Add event handler to remove module
 		$('.modules').find('.remove-module').each(function(i){
 			$(this).click(function(e){
-				removeModule($(this).parent().parent().parent().children('.overlay-id').val(), $(this).parent().data("moduleid"));
+				var deleteModule = confirm("Delete module: Are you sure?");
+				if (deleteModule){
+					removeModule($(this).parent().parent().parent().children('.overlay-id').val(), $(this).parent().data("moduleid"));
+				}
 			});
 		});
 
@@ -140,12 +194,21 @@ function displayOverlay(data){
 		'<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
 			'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
 			'<h3 class="overlay-name">' + dataName + '</h3>' +
-			'<p><b>Overlay Link:</b> <a href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a></p>' +
+			'<p><b>Overlay Link:</b> <a class="link" target="_blank" href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a> <button type="button" class="btn btn-light copy-clip"><i class="fas fa-clipboard"></i></button></p>' +
 			'<div class="modules"></div>' +
 			'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
 			'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
 			'<br class="clear">' +
 		'</div>');
+	
+	//Copy to clipboard
+	/*$(".copy-clip").click(function(){
+		var temp = $("<input>");
+  		$("body").append(temp);
+		temp.val($(".overlay[dataoverlayid=" + data.id + "] .link").attr('href')).select();
+		document.execCommand("copy");
+		console.log("copy to clipboard!");
+	});*/
 	
 	//Add and listen to modules
 	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(snapshot => {
@@ -155,7 +218,7 @@ function displayOverlay(data){
 			//console.log(change.doc.data());
 			if(change.type == 'added'){
 				displayModule(data.id, change.doc);
-				console.log(change.doc);
+				//console.log(change.doc);
 			} else if (change.type == 'removed'){
 				$('.module[data-moduleid='+ change.doc.id +']').remove();
 			} else if (change.type == 'modified'){
@@ -168,7 +231,10 @@ function displayOverlay(data){
 	//Add event handler to elements created by Javascript
 	$('.overlays').find('.remove-overlay').each(function(i){
 		$(this).click(function(e){
-			removeOverlay($(this).parent().children('.overlay-id').val());
+			var deleteOverlay = confirm("Delete Overlay: Are you sure?");
+			if (deleteOverlay){
+				removeOverlay($(this).parent().children('.overlay-id').val());
+			}
 		});
 	});
 	

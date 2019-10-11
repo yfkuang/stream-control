@@ -7,6 +7,10 @@ var uid = $('meta[name="uid"]').attr('data');
 var overlayid = $('meta[name="uid"]').attr('data');
 
 /*--------------
+//Module Functions
+--------------*/
+
+/*--------------
 //Event Listeners
 --------------*/
 $("overlay-program").ready(function(){//Initialize Event Listeners
@@ -18,12 +22,12 @@ $("overlay-program").ready(function(){//Initialize Event Listeners
 		let changes = snapshot.docChanges();
 		//console.log(changes);
 		changes.forEach(change =>{
-			//console.log(change.doc.data());
-			if(change.type == 'added'){
-				console.log(change.doc);
+			console.log(change.doc.data());
+			/*if(change.type == 'added'){
+				console.log(change.doc.data().status);
 			} else if (change.type == 'modified'){
 				console.log(change.doc);
-			}
+			}*.
 		});
 	});
 });
