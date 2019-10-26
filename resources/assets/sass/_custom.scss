@@ -16,10 +16,14 @@ button{
 	margin: 5px;
 }
 
-input[type=text], input[type=password]{
+input[type=text], input[type=password], input[type=number], input[list]{
 	margin: 5px;
 	padding: 5px;
 	font-size: 16pt;
+}
+
+input[type=number]{
+	width: 50px;
 }
 /*--------------
 //Header
@@ -49,6 +53,12 @@ footer{
 --------------*/
 section.content {
 	padding: 100px 0 40px 0;
+}
+
+//Modal
+.modal-body{
+	max-height: 500px;
+	overflow-y: scroll;
 }
 
 //Overlays
@@ -98,10 +108,6 @@ a {
 	overflow-wrap: break-word;
 }
 
-.full-width{
-	width: 100%;
-}
-
 //Lower-Thirds
 
 
@@ -130,4 +136,24 @@ a {
 --------------*/
 .clear{
 	clear: both;
+}
+
+.full-width{
+	width: 100%;
+}
+
+.half-width{
+	width: 50%;
+}
+
+.flex-container{
+	display: flex;
+}
+
+.flex-center{
+	justify-content: center;
+}
+
+.flex-wide{
+	flex-grow: 2;
 }

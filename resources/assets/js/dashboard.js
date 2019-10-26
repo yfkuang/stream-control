@@ -19,12 +19,16 @@ function makeid() {
   return text;
 }
 
+
+/*--------------
+//Buttons
+--------------*/
 //Update all inputs
 function update(){
 	
 	$('input.updateable').each(function(){
 		var overlayid = $(this).parents('.overlay').data('overlayid');
-		var moduleid = $(this).parent().data('moduleid');
+		var moduleid = $(this).parents('.module').data('moduleid');
 		var element = $(this).attr('name');
 		
 		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).set({
@@ -33,6 +37,104 @@ function update(){
 			console.log(overlayid + " " + moduleid + " " + element + " updated!");
 		});
 	});	
+}
+
+//Assign target element when modal pops up
+function listenElementSettings(moduleid){
+	if(moduleid){
+		$('.module[data-moduleid=' + moduleid + '] .element-settings-button').each(function(){
+			$(this).click(function(){
+				var element = $(this).data('element');
+				var overlayid = $(this).parents('.overlay').data('overlayid');
+
+				$('.element-setting').each(function(){
+					$(this).attr('data-element', element);
+					$(this).attr('data-overlayid', overlayid);
+					$(this).attr('data-moduleid', moduleid);
+				});
+				
+				displaySettings(overlayid,moduleid,element);
+			});
+		});
+	} else {
+		$('.element-settings-button').each(function(){
+			$(this).click(function(){
+				var element = $(this).data('element');
+				var overlayid = $(this).parents('.overlay').data('overlayid');
+				var moduleid = $(this).parents('.module').data('moduleid');
+
+				$('.element-setting').each(function(){
+					$(this).attr('data-element', element);
+					$(this).attr('data-overlayid', overlayid);
+					$(this).attr('data-moduleid', moduleid);
+				});
+			});
+		});
+	}
+}
+
+//Update element settings
+$('.element-setting-apply').click(function(){
+	$('.element-setting').each(function(){
+		var overlayID = $(this).attr('data-overlayid');
+		var moduleid = $(this).attr('data-moduleid');
+		var element = $(this).attr('data-element');
+		var elementName = $(this).attr('name');
+		var value = $(this).val();
+		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(moduleid).collection('elements').doc(element).update({
+				[elementName]: value,
+		}).then(function(){
+			console.log(overlayID + " " + moduleid + " " + element + " " + elementName + " updated!");
+		});
+	})
+
+});
+
+//Toggleable elements
+function listenToggle(overlayID, module){
+	
+	$('toggle-hide').each(function(){
+		var element = $(this).data('element');
+		
+		/*firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayID).collection("modules").doc(module.id).collection("elements").doc("element").onSnapshot(snapshot => {
+			let changes = snapshot.docChanges();
+			//console.log(changes);
+			changes.forEach(change =>{
+				//console.log(change.doc.data());
+				if(change.type == 'added'){
+					//displayModule(data.id, change.doc);
+					console.log(change.doc);
+				} else if (change.type == 'removed'){
+					
+				} else if (change.type == 'modified'){
+					
+				}
+			});
+		});
+		
+		if(doc.data().status == undefined || doc.data().status == false){
+			$('.takel3d').removeClass("btn-warning");
+		} else if (doc.data().status == true){
+			$('.takel3d').addClass("btn-warning");
+		}
+		
+		$(this).click(function(){
+			if(doc.data().status == undefined || doc.data().status == false){
+				firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).update({
+					status: true,
+				}).then(function(){
+					console.log(overlayID + " " + doc.id + " lower-third taken!");
+				});
+			} else if (doc.data().status == true){
+				firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).update({
+					status: false,
+				}).then(function(){
+					console.log(overlayID + " " + doc.id + " lower-third off!");
+				});
+			}
+		});*/
+	});
+	
 }
 
 /*--------------
@@ -68,49 +170,65 @@ function displayModule(overlayID, doc){
 				'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i>&nbsp;Remove Module</button>' +
 				'<br class="clear">' +
 			'</div>');
-
+		
+		//Display module based on type
 		switch(doc.data().type){
 
 			case 'versus'://Versus
 
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
-					'<input class="updateable full-width" name="game" list="games-list" placeholder="Select a game">' +
+					'<input class="updateable full-width" name="game" list="games-list" placeholder="Select a game category">' +
 					'<datalist id="games-list">' +
 						'<option value="Super Smash Bros. Melee Singles">' +
 						'<option value="Super Smash Bros. Melee Doubles">' +
+						'<option value="Overwatch">' +
 					'</datalist>'
 				);
 
-				//if(doc.data())
-
-				$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-
+				//display appropriate inputs on list value (game category) change
+				$('.module[data-moduleid=' + doc.id + '] .updateable[name=game]').change(function(){
+					var game = $(this).val();
+					
+					console.log(doc.id + " game category changed to " + game);
+					$('.module[data-moduleid=' + doc.id + ']  .game').remove();
+					
+					displayVersus(overlayID, doc, game);
+				});
+				
+				break;
+				
+			case 'text':
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<div class="flex-container full-width">' +
+						'<input class="updateable flex-wide" type="text" name="text" placeholder="Text">' +
+						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>'
 				);
-
+				
 				break;
 
 			case 'lower-thirds'://Lower-Thirds
 
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
-					'<input class="updateable full-width" type="text" name="upperl3d" placeholder="Upper Lower-Third">' +
-					'<input class="updateable full-width" type="text" name="lowerl3d" placeholder="Lower Lower-Third">' +
+					'<div class="flex-container full-width">' +
+						'<input class="updateable flex-wide" type="text" name="upperl3d" placeholder="Upper Lower-Third">' +
+						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container full-width">' +
+						'<input class="updateable flex-wide" type="text" name="lowerl3d" placeholder="Lower Lower-Third">' +
+						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
 					'<button class="btn takel3d" type="button"><i class="fas fa-camera"></i> Take Overlay</button>'
 				);
 				
-				/*firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).once("status").then(function(snapshot){
-					var status = snapshot.val();
-					console.log(status);
-				});*/
-				
+				//Displat "take l3d" state
 				if(doc.data().status == undefined || doc.data().status == false){
 					$('.takel3d').removeClass("btn-warning");
 				} else if (doc.data().status == true){
 					$('.takel3d').addClass("btn-warning");
 				}
 				
-				//Take lower-third function
-				
-				
+				//Take l3d function
 				$('.takel3d').click(function(){
 					if(doc.data().status == undefined || doc.data().status == false){
 						firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(doc.id).update({
@@ -128,27 +246,21 @@ function displayModule(overlayID, doc){
 				});
 
 				break;
+				
+			case 'timer'://Timer
+				
+				
+				break;
 		}
-
-		doc.ref.collection("elements").get().then(function(elements){
-			elements.docs.forEach(function(element){
-				if(element.exists){
-					//console.log(element.id + ": " + element.data().value);
-					$('.module[data-moduleid=' + doc.id + '] input.updateable[name=' + element.id + ']').each(function(){
-						
-						switch($(this).attr('name')){
-						
-							default:
-							   $(this).val(element.data().value);
-							   
-							   break;
-						}
-						
-						console.log(doc.id + ", " + $(this).attr('name') + ", " + $(this).val());
-					});
-				}
-			});
-		});
+		
+		//listen to element settings buttons
+		listenElementSettings();
+		
+		//listen to toggleable elements
+		listenToggle(overlayID, doc);
+		
+		//Get data from database E.g. previous session
+		displayData(overlayID, doc);
 		
 		//Add event handler to remove module
 		$('.modules').find('.remove-module').each(function(i){
@@ -164,6 +276,96 @@ function displayModule(overlayID, doc){
 		// doc.data() will be undefined in this case
 		console.log("No modules!");
 	}	
+}
+
+//Function for getting data from database E.g. previous session
+function displayData(overlayID, doc){
+	
+		doc.ref.collection("elements").get().then(function(elements){
+			elements.docs.forEach(function(element){
+				if(element.exists){
+					//console.log(element.id + ": " + element.data().value);
+					$('.module[data-moduleid=' + doc.id + '] input.updateable[name=' + element.id + ']').each(function(){
+						
+						switch($(this).attr('name')){
+							case 'game':
+								$(this).val(element.data().value);
+								displayVersus(overlayID, doc, element.data().value);
+								
+								break;
+								
+							default:
+							   $(this).val(element.data().value);
+							   
+							   break;
+						}
+						
+						console.log(doc.id + ", " + $(this).attr('name') + ", " + $(this).val());
+					});
+				}
+			});
+		});
+}
+
+//Function for getting data from database E.g. previous session
+function displaySettings(overlayID, moduleid, element){
+	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(moduleid).collection("elements").doc(element).get().then(function(element){
+		$.each(element.data(), function(key, value){
+			$('#element-settings .element-setting[name=' + key + ']').each(function(){
+				$(this).val(value);
+			});
+		});
+	});
+}
+
+//Function for displaying appropriate inputs on list value (game category) change
+function displayVersus(overlayID, module, game){
+
+	switch(game){
+		case 'Super Smash Bros. Melee Singles':
+			/*$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+
+			);*/
+
+			break;
+
+		case 'Super Smash Bros. Melee Doubles':
+			/*$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
+
+			);*/
+
+			break;
+
+		case 'Overwatch':
+			//console.log("test");
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="ow-teamLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-teamLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="ow-teamLeft" placeholder="Left Team Name">' +
+						'<button class="btn btn-primary switch" data-switch="team" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="ow-teamRight" placeholder="Right Team Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-teamRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="ow-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="ow-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-switch="score" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable" type="number" name="ow-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="ow-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+
+			break;
+	}
+	
+	//listen to element settings buttons
+	listenElementSettings(module.id);
 }
 
 /*--------------
@@ -193,7 +395,9 @@ function displayOverlay(data){
 	$('.overlays').append(
 		'<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
 			'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
-			'<h3 class="overlay-name">' + dataName + '</h3>' +
+			'<div class="flex-container full-width">' +
+				'<h3 class="overlay-name">' + dataName + '</h3>' +
+			'</div>' +
 			'<p><b>Overlay Link:</b> <a class="link" target="_blank" href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a> <button type="button" class="btn btn-light copy-clip"><i class="fas fa-clipboard"></i></button></p>' +
 			'<div class="modules"></div>' +
 			'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
@@ -243,7 +447,7 @@ function displayOverlay(data){
 		$(this).click(function(e){
 			var oldName = $(this).text();
 			
-			$(this).before('<input name="overlay-rename-title" type="text" value="' + oldName + '"><button class="btn btn-basic overlay-rename-title"><i class="fas fa-check"></i></button>');
+			$(this).before('<input class="flex-wide" name="overlay-rename-title" type="text" value="' + oldName + '"><button class="btn btn-basic overlay-rename-title"><i class="fas fa-check"></i></button>');
 			
 			//Rename overlay
 			$(this).parent().find('.overlay-rename-title').each(function(i){
@@ -285,42 +489,45 @@ function displayOverlay(data){
 //Event Listeners
 --------------*/
 $(document).ready(function(){//Initialize Event Listeners
+	var pathname = window.location.pathname
+	if(pathname == "/dashboard"){
 	
-	$('.add-overlay').click(function(){
-		addOverlay();
-	});
-	
-	$('.module-button').click(function(){
-		var type = $(this).attr('data-type');
-		var overlayid = $(this).attr('data-overlayid');
-		var overlayName = $(this).attr('data-overlayname');
-	
-		addModule(overlayid, overlayName, type);
-	});
-	
-	$('.update').click(function(){
-		update();
-	});
-	
-	/*--------------
-	//Realtime Event Listener
-	--------------*/
-	
-	//Overlays
-	firebase.firestore().collection('users').doc(uid).collection("overlays").onSnapshot(snapshot => {
-		let changes = snapshot.docChanges();
-		//console.log(changes);
-		changes.forEach(change =>{
-			//console.log(change.doc.data());
-			if(change.type == 'added'){
-				displayOverlay(change.doc);
-				//console.log(change.doc);
-			} else if (change.type == 'removed'){
-				$('.overlay[data-overlayid='+ change.doc.id +']').remove();
-			} else if (change.type == 'modified'){
-				$('.overlay[data-overlayid='+ change.doc.id +']').remove();
-				displayOverlay(change.doc);
-			}
+		$('.add-overlay').click(function(){
+			addOverlay();
 		});
-	});
+
+		$('.module-button').click(function(){
+			var type = $(this).attr('data-type');
+			var overlayid = $(this).attr('data-overlayid');
+			var overlayName = $(this).attr('data-overlayname');
+
+			addModule(overlayid, overlayName, type);
+		});
+
+		$('.update').click(function(){
+			update();
+		});
+
+		/*--------------
+		//Realtime Event Listener
+		--------------*/
+
+		//Overlays
+		firebase.firestore().collection('users').doc(uid).collection("overlays").onSnapshot(snapshot => {
+			let changes = snapshot.docChanges();
+			//console.log(changes);
+			changes.forEach(change =>{
+				//console.log(change.doc.data());
+				if(change.type == 'added'){
+					displayOverlay(change.doc);
+					//console.log(change.doc);
+				} else if (change.type == 'removed'){
+					$('.overlay[data-overlayid='+ change.doc.id +']').remove();
+				} else if (change.type == 'modified'){
+					$('.overlay[data-overlayid='+ change.doc.id +']').remove();
+					displayOverlay(change.doc);
+				}
+			});
+		});
+	}
 });

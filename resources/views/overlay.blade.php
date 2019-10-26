@@ -8,21 +8,19 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<style>
-		@font-face {
-		  font-family: Montserrat;
-		  src: url('https://fonts.googleapis.com/css?family=Montserrat');
-		}
 		
-		html, body{
+		html, body, .module{
 			position: absolute;
 			top: 0;
 			left: 0;
 			width: 1280px;
 			height: 720px;
-			font-family: Montserrat;
-			text-transform: uppercase;
-			text-shadow: 0px 0px 3px rgba(0,0,0,0.5);
 			margin: 0;
+		}
+		
+		.element{
+			position: absolute;
+			opacity: 0;
 		}
 	</style>
 </head>
