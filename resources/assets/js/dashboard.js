@@ -31,7 +31,18 @@ function update(){
 		var moduleid = $(this).parents('.module').data('moduleid');
 		var element = $(this).attr('name');
 		
-		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).set({
+		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).update({
+			value: $(this).val(),
+		}).then(function(){
+			console.log(overlayid + " " + moduleid + " " + element + " updated!");
+		}).catch(err => {
+			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).set({
+				value: $(this).val(),
+			}).then(function(){
+				console.log(overlayid + " " + moduleid + " " + element + " set!");
+			});
+		});
+		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(moduleid).collection('elements').doc(element).update({
 				value: $(this).val(),
 		}).then(function(){
 			console.log(overlayid + " " + moduleid + " " + element + " updated!");
@@ -44,7 +55,7 @@ function listenElementSettings(moduleid){
 	if(moduleid){
 		$('.module[data-moduleid=' + moduleid + '] .element-settings-button').each(function(){
 			$(this).click(function(){
-				var element = $(this).data('element');
+				var element = $(this).attr('data-element');
 				var overlayid = $(this).parents('.overlay').data('overlayid');
 
 				$('.element-setting').each(function(){
@@ -59,15 +70,17 @@ function listenElementSettings(moduleid){
 	} else {
 		$('.element-settings-button').each(function(){
 			$(this).click(function(){
-				var element = $(this).data('element');
-				var overlayid = $(this).parents('.overlay').data('overlayid');
-				var moduleid = $(this).parents('.module').data('moduleid');
+				var element = $(this).attr('data-element');
+				var overlayid = $(this).parents('.overlay').attr('data-overlayid');
+				var moduleid = $(this).parents('.module').attr('data-moduleid');
 
 				$('.element-setting').each(function(){
 					$(this).attr('data-element', element);
 					$(this).attr('data-overlayid', overlayid);
 					$(this).attr('data-moduleid', moduleid);
 				});
+				
+				displaySettings(overlayid,moduleid,element);
 			});
 		});
 	}
@@ -85,6 +98,28 @@ $('.element-setting-apply').click(function(){
 				[elementName]: value,
 		}).then(function(){
 			console.log(overlayID + " " + moduleid + " " + element + " " + elementName + " updated!");
+		}).catch(err => {
+			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(moduleid).collection('elements').doc(element).set({
+				[elementName]: value,
+			}).then(function(){
+				console.log(overlayID + " " + moduleid + " " + element + " " + elementName + " updated!");
+			});
+		});
+	});
+
+});
+
+//Update module settings
+$('.module-setting-apply').click(function(){
+	$('.module-setting').each(function(){
+		var overlayID = $(this).attr('data-overlayid');
+		var moduleid = $(this).attr('data-moduleid');
+		var moduleName = $(this).attr('name');
+		var value = $(this).val();
+		firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayID).collection('modules').doc(moduleid).update({
+				[moduleName]: value,
+		}).then(function(){
+			console.log(overlayID + " " + moduleid + " " + moduleName + " updated!");
 		});
 	})
 
@@ -165,8 +200,9 @@ function displayModule(overlayID, doc){
 
 		$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
 			'<div class="module" data-moduleid="' + doc.id + '" data-type="' + doc.data().type + '">' +
-				'<h4>' + doc.data().type + '</h4>' +
+				'<h4 class="">' + doc.data().type + '</h4>' +
 				'<input type="hidden" class="module-content-end"><br>' +
+				'<button class="btn btn-light module-settings-button" type="button" data-toggle="modal" data-target="#module-settings" data-moduleid="' + doc.id + '"><i class="fas fa-cog"></i>&nbsp;Module Settings</button>' +
 				'<button class="btn btn-danger remove-module" type="button"><i class="fas fa-trash-alt"></i>&nbsp;Remove Module</button>' +
 				'<br class="clear">' +
 			'</div>');
@@ -201,9 +237,11 @@ function displayModule(overlayID, doc){
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
 					'<div class="flex-container full-width">' +
 						'<input class="updateable flex-wide" type="text" name="text" placeholder="Text">' +
-						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="text" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 					'</div>'
 				);
+				
+				listenElementSettings(doc.id);
 				
 				break;
 
@@ -246,6 +284,40 @@ function displayModule(overlayID, doc){
 				});
 
 				break;
+			
+			case 'casters'://Casters
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<div class="flex-container">' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTag1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTag1" placeholder="Caster Tag">' +
+						'</div>' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTag2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTag2" placeholder="Caster Tag">' +
+						'</div>' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTag3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTag3" placeholder="Caster Tag">' +
+						'</div>' +
+					'</div>' +
+					'<div class="flex-container">' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTwitter1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTwitter1" placeholder="Caster Twitter">' +
+						'</div>' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTwitter2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTwitter2" placeholder="Caster Twitter">' +
+						'</div>' +
+						'<div class="flex-container flex-wide">' +
+							'<button class="btn btn-light element-settings-button" data-element="casterTwitter3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+							'<input class="updateable flex-wide" type="text" name="casterTwitter3" placeholder="Caster Twitter">' +
+						'</div>' +
+					'</div>'
+				);
+				
+				break;
 				
 			case 'timer'://Timer
 				
@@ -254,7 +326,7 @@ function displayModule(overlayID, doc){
 		}
 		
 		//listen to element settings buttons
-		listenElementSettings();
+		//listenElementSettings();
 		
 		//listen to toggleable elements
 		listenToggle(overlayID, doc);
@@ -347,7 +419,7 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-primary switch" data-switch="team" type="button"><i class="fas fa-sync-alt"></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="ow-teamRight" placeholder="Right Team Name">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-teamRight"><i class="fas fa-eye"></i></i></button>' +
-						'<button class="btn btn-light element-settings-button" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="ow-teamRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 					'</div>' +
 					'<div class="flex-container flex-center full-width ">' +
 						'<button class="btn btn-light element-settings-button" data-element="ow-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -450,9 +522,9 @@ function displayOverlay(data){
 			$(this).before('<input class="flex-wide" name="overlay-rename-title" type="text" value="' + oldName + '"><button class="btn btn-basic overlay-rename-title"><i class="fas fa-check"></i></button>');
 			
 			//Rename overlay
-			$(this).parent().find('.overlay-rename-title').each(function(i){
+			$(this).parent().find('.overlay-rename-title').each(function(){
 				$(this).click(function(){
-					firebase.firestore().collection("users").doc(uid).collection("overlays").doc($(this).parent().children('.overlay-id').val()).update({
+					firebase.firestore().collection("users").doc(uid).collection("overlays").doc($(this).parents('.overlay').data('overlayid')).update({
 						name: $(this).parent().children('input[name="overlay-rename-title"]').val()
 					}).then(function() {
 						console.log("Overlay renamed!");

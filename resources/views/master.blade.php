@@ -89,7 +89,11 @@
 								@endforeach
 							</datalist>
 							{{Form::label('Text Size')}}
-							{{Form::text('font-size', null, ['class' => 'element-setting full-width'])}}
+							{{Form::text('fontSize', null, ['class' => 'element-setting full-width'])}}
+							{{Form::label('Font Weight')}}
+							{{Form::text('fontWeight', null, ['class' => 'element-setting full-width'])}}
+							{{Form::label('Letter Spacing')}}
+							{{Form::text('letterSpace', null, ['class' => 'element-setting full-width'])}}
 						</div>
 						
 						<br>
@@ -98,7 +102,9 @@
 							{{Form::label('Animation')}}
 							{{Form::select('animationIn', array('none' => 'None', 'fadeIn' => 'Fade In', 'fadeInFromLeft' => 'Fade In From Left', 'fadeInFromRight' => 'Fade In From Right'), null, ['class' => 'element-setting full-width'])}}
 							{{Form::label('Duration (ms)')}}
+							{{Form::text('durationIn', null, ['class' => 'element-setting full-width'])}}
 							{{Form::label('Delay (ms)')}}
+							{{Form::text('delayIn', null, ['class' => 'element-setting full-width'])}}
 						</div>
 						
 						<br>
@@ -107,9 +113,45 @@
 							{{Form::label('Animation')}}
 							{{Form::select('animationOut', array('none' => 'None', 'fadeOut' => 'Fade Out', 'fadeOutToLeft' => 'Fade Out To Left', 'fadeoutToRight' => 'Fade Out To Right'), null, ['class' => 'element-setting full-width'])}}
 							{{Form::label('Duration (ms)')}}
+							{{Form::text('durationOut', null, ['class' => 'element-setting full-width'])}}
 							{{Form::label('Delay (ms)')}}
+							{{Form::text('delayOut', null, ['class' => 'element-setting full-width'])}}
 						</div>
 						
+						<br>
+						<h4>Background Webm</h4>
+						<div class="full-width">
+						{{Form::file('file_name')}}
+						{{Form::label('FreezeFrame (ms)')}}
+						{{Form::text('webmFreeze', null, ['class' => 'element-setting full-width'])}}
+						{{Form::label('Duration (ms)')}}
+						{{Form::text('webmduration', null, ['class' => 'element-setting full-width'])}}
+						{{Form::label('Delay (ms)')}}
+						{{Form::text('webmdelay', null, ['class' => 'element-setting full-width'])}}
+						</div>
+						
+						<br>
+						<h4>Additional CSS</h4>
+						{{Form::textarea('css', null, ['placeholder' => 'CSS', 'class' => 'element-setting full-width'])}}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-success element-setting-apply" data-dismiss="modal">Apply</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="module-settings" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Module Settings</h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
 						<br>
 						<h4>Background Webm</h4>
 						<div class="full-width">
@@ -118,12 +160,11 @@
 						
 						<br>
 						<h4>Additional CSS</h4>
-						{{Form::textarea('css', 'position: absolute;
-box-sizing: border-box;', ['placeholder' => 'CSS', 'class' => 'element-setting full-width'])}}
+						{{Form::textarea('css', null, ['placeholder' => 'CSS', 'class' => 'module-setting full-width'])}}
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-success element-setting-apply" data-dismiss="modal">Apply</button>
+						<button type="button" class="btn btn-success module-setting-apply" data-dismiss="modal">Apply</button>
 					</div>
 				</div>
 			</div>

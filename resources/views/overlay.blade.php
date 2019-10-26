@@ -20,7 +20,10 @@
 		
 		.element{
 			position: absolute;
+			box-sizing: border-box;
 			opacity: 0;
+			margin: 0;
+			padding: 0;
 		}
 	</style>
 </head>

@@ -19,7 +19,8 @@ button{
 input[type=text], input[type=password], input[type=number], input[list]{
 	margin: 5px;
 	padding: 5px;
-	font-size: 16pt;
+	font-size: 12pt;
+	min-width: 40px;
 }
 
 input[type=number]{
@@ -146,6 +147,10 @@ a {
 	width: 50%;
 }
 
+.third-width{
+	width: 33%;
+}
+
 .flex-container{
 	display: flex;
 }
@@ -155,5 +160,5 @@ a {
 }
 
 .flex-wide{
-	flex-grow: 2;
+	flex-grow: 5;
 }
