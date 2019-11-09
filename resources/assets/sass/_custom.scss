@@ -101,6 +101,12 @@ section.content {
 	text-transform: capitalize;
 }
 
+.module label{
+	padding: 15px 5px;
+	margin: 0;
+    box-sizing: border-box;
+}
+
 .remove-overlay, .remove-module{
 	float: right;
 }
@@ -109,6 +115,9 @@ a {
 	overflow-wrap: break-word;
 }
 
+.dynamic-image{
+	object-fit: contain;
+}
 //Lower-Thirds
 
 

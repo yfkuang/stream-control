@@ -9,6 +9,7 @@
 global.firebase = require('firebase/app');
 require('firebase/auth');
 require('firebase/firestore');
+require('firebase/storage');
 
 $(document).ready(function(){
 	var firebaseConfig = {

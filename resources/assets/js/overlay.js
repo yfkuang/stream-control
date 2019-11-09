@@ -48,6 +48,20 @@ function displayModule(doc){
 					if(game.exists){
 						
 						switch(game.data().value){
+							case 'Super Smash Bros. Melee Singles':
+								$("body").append(
+									'<div class="module" data-moduleid="' + doc.id + '">' +
+										'<p class="element" style="" data-element="melee-playerLeft"><span data-element="melee-sponsorLeft"></span></p>' +
+										'<p class="element" style="" data-element="melee-playerRight"><span data-element="melee-sponsorRight"></span></p>' +
+										'<p class="element" style="" data-element="melee-portLeft"></p>' +
+										'<p class="element" style="" data-element="melee-portRight"></p>' +
+										'<p class="element" style="" data-element="melee-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="melee-scoreRight"></p>' +
+									'</div>'
+								);
+								
+								break;
+							
 							case 'Overwatch':
 								$("body").append(
 									'<div class="module" data-moduleid="' + doc.id + '">' +
@@ -112,6 +126,7 @@ function dataChange(doc){
 				"font-family": change.doc.data().font,
 				"font-weight": change.doc.data().fontWeight,
 				"letter-spacing": change.doc.data().letterSpace,
+				"text-align": change.doc.data().textAlign,
 			}
 			
 			switch (change.doc.data().anchor){
@@ -167,6 +182,7 @@ function dataChange(doc){
 			//console.log(animationArray[change.doc.data().animationIn]);
 			
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").delay(change.doc.data().delayOut).animate(animationArray[change.doc.data().animationOut], change.doc.data().durationOut);
+			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").removeAttr("style");
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").text(change.doc.data().value);
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").css(style);
 			

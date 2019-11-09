@@ -50,6 +50,20 @@ function update(){
 	});	
 }
 
+//Copy to clipboard
+function listenCopyClip(overlayid){
+	$(".copy-clip").each(function(){
+		$(this).click(function(){
+			var temp = $("<input>");
+			$("body").append(temp);
+			temp.val($(".overlay[data-overlayid=" + overlayid + "] .link").attr('href')).select();
+			document.execCommand("copy");
+			console.log(overlayid + " URL copied to clipboard!");
+			temp.remove();
+		});
+	});
+}
+
 //Assign target element when modal pops up
 function listenElementSettings(moduleid){
 	if(moduleid){
@@ -170,6 +184,23 @@ function listenToggle(overlayID, module){
 		});*/
 	});
 	
+}
+
+//Listen Switch Button
+function listenSwitch(moduleid) {
+	$('.switch').each(function() {
+		$(this).click(function(){
+			var target1 = $(this).attr('data-target1');
+			var target2 = $(this).attr('data-target2');
+			var target1Value = $('.updateable[name=' + target1 + ']').val();
+			var target2Value = $('.updateable[name=' + target2 + ']').val();
+
+			$('.updateable[name=' + target1 + ']').val(target2Value);
+			$('.updateable[name=' + target2 + ']').val(target1Value);
+
+			console.log('Switched ' + target1 + " and " + target2);
+		});
+	});
 }
 
 /*--------------
@@ -372,6 +403,15 @@ function displayData(overlayID, doc){
 							   break;
 						}
 						
+						//Display Dynamic Images
+						$('.module[data-moduleid=' + doc.id + '] .dynamic-image-target').each(function(){
+							var imageRef = $(this).val();
+							var storageRef = $(this).attr('data-storage-ref');
+							var target = $(this).attr('name');
+
+							displayImages(doc.id,target,storageRef,imageRef);
+						});
+						
 						console.log(doc.id + ", " + $(this).attr('name') + ", " + $(this).val());
 					});
 				}
@@ -390,14 +430,83 @@ function displaySettings(overlayID, moduleid, element){
 	});
 }
 
+//Function for getting dynamic images in Firebase storage
+function displayImages(moduleid, target, storageRef, imageRef){
+	$('.dynamic-image[data-target=' + target + ']').each(function() {
+		var img = $(this);
+		
+		firebase.storage().ref(storageRef + '/' + imageRef + '.png').getDownloadURL().then(function(url) {
+			img.attr('src', url);
+		}).catch(function(error) {
+			console.log("Error retrieving from storage: " + error);
+		});
+	});
+}
+
 //Function for displaying appropriate inputs on list value (game category) change
 function displayVersus(overlayID, module, game){
 
 	switch(game){
 		case 'Super Smash Bros. Melee Singles':
-			/*$('.overlay-id[value='+ overlayID +']').parent().children('.modules').append(
-
-			);*/
+			//console.log("test");
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' + //Sponsors
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-sponsorLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-sponsorLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="melee-singles-sponsorLeft" placeholder="Left Player Sponsor">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-sponsorLeft" data-target2="melee-singles-sponsorRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="melee-singles-sponsorRight" placeholder="Right Player Sponsor">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-sponsorRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-sponsorRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container full-width ">' + //Player Tags
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-playerLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-playerLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="melee-singles-playerLeft" placeholder="Left Player Tag">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-playerLeft" data-target2="melee-singles-playerRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="melee-singles-playerRight" placeholder="Right Player Tag">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-playerRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-playerRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Characters
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="melee-singles-charLeft">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charLeft">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-charLeft" data-target2="melee-singles-charRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charRight">' +
+						'<img class="dynamic-image melee-char" data-target="melee-singles-charRight">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Port
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-portLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-portLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<label>Port</label>' +
+						'<input class="updateable" type="number" name="melee-singles-portLeft" size="2" value="0" min="1" max="4">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-portLeft" data-target2="melee-singles-portRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable" type="number" name="melee-singles-portRight" size="2" value="1" min="1" max="4">' +
+						'<label>Port</label>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-portRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-portRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Score
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<label>Score</label>' +
+						'<input class="updateable" type="number" name="melee-singles-scoreLeft" size="2" value="1" min="0" max="2">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-scoreLeft" data-target2="melee-singles-scoreRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<input class="updateable" type="number" name="melee-singles-scoreRight" size="2" value="0" min="0" max="2">' +
+						'<label>Score</label>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
+			//listen to switch buttons
+			listenSwitch(module.id);
 
 			break;
 
@@ -438,6 +547,17 @@ function displayVersus(overlayID, module, game){
 	
 	//listen to element settings buttons
 	listenElementSettings(module.id);
+	
+	//display appropriate inputs on inputs with dynamic images
+	$('.module[data-moduleid=' + module.id + '] .dynamic-image-target').change(function(){
+		var imageRef = $(this).val();
+		var storageRef = $(this).attr('data-storage-ref');
+		var target = $(this).attr('name');
+		
+		displayImages(module.id,target,storageRef,imageRef);
+	});
+	
+	
 }
 
 /*--------------
@@ -477,14 +597,9 @@ function displayOverlay(data){
 			'<br class="clear">' +
 		'</div>');
 	
-	//Copy to clipboard
-	/*$(".copy-clip").click(function(){
-		var temp = $("<input>");
-  		$("body").append(temp);
-		temp.val($(".overlay[dataoverlayid=" + data.id + "] .link").attr('href')).select();
-		document.execCommand("copy");
-		console.log("copy to clipboard!");
-	});*/
+	
+	//Listen to copy-to-clipboard button
+	listenCopyClip(data.id);
 	
 	//Add and listen to modules
 	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(data.id).collection("modules").onSnapshot(snapshot => {
