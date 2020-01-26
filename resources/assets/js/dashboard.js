@@ -50,6 +50,49 @@ function update(){
 	});	
 }
 
+//Upload Media
+$('#upload-button').change(function(){
+	//Get files
+	var file = this.files[0];
+	
+	//Create a storage ref
+	var storageRef = firebase.storage().ref('user_data/' + uid + '/' + file.name);
+	
+	//upload file
+	var media = storageRef.put(file);
+	
+	//Progress bar
+	media.on('state_changed', function progress (snapshot){
+		var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+		$('#upload-progress').val(percentage);
+		$('#upload-text').text(percentage + "%");
+	}, function error(err){
+		console.log("Upload error: " + err);
+	}, function complete(){
+		$('#upload-text').text("Upload Complete");
+		console.log(file.name + " uploaded");
+	});
+});
+
+//List Media
+function listMediaUpload(){
+	// Find all the prefixes and items.
+	$('#media-list').empty();
+	
+	firebase.storage().ref('user_data/' + uid).listAll().then(function(result) {
+		result.items.forEach(function(item){
+			//console.log(item.name);
+			$('#media-list').append("<li>" + item.name + "</li>")
+		});
+	}).catch(function(error) {
+		console.log("Storage retrieval error: " + error);
+	});
+}
+
+$('.media').click(function(){
+	listMediaUpload();
+});
+
 //Copy to clipboard
 function listenCopyClip(overlayid){
 	$(".copy-clip").each(function(){
@@ -78,6 +121,19 @@ function listenElementSettings(moduleid){
 					$(this).attr('data-moduleid', moduleid);
 				});
 				
+				$('#user-uploads').empty();
+				
+				//List user uploads
+				firebase.storage().ref('user_data/' + uid).listAll().then(function(result) {
+					result.items.forEach(function(item){
+						//console.log(item.fullPath);
+						$('#user-uploads').append('<option value="' + item.fullPath + '">' + item.name + "</option>");
+					});
+				}).catch(function(error) {
+					console.log("Storage retrieval error: " + error);
+				});
+				
+				//Load in previous settings
 				displaySettings(overlayid,moduleid,element);
 			});
 		});
@@ -94,6 +150,17 @@ function listenElementSettings(moduleid){
 					$(this).attr('data-moduleid', moduleid);
 				});
 				
+				//List user uploads
+				firebase.storage().ref('user_data/' + uid).listAll().then(function(result) {
+					result.items.forEach(function(item){
+						//console.log(item.fullPath);
+						$('#user-uploads').append('<option value="' + item.fullPath + '">' + item.name + "</option>");
+					});
+				}).catch(function(error) {
+					console.log("Storage retrieval error: " + error);
+				});
+				
+				//Load in previous settings
 				displaySettings(overlayid,moduleid,element);
 			});
 		});
@@ -246,9 +313,11 @@ function displayModule(overlayID, doc){
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
 					'<input class="updateable full-width" name="game" list="games-list" placeholder="Select a game category">' +
 					'<datalist id="games-list">' +
+						'<option value="Generic">' +
+						'<option value="EA NHL">' +
+						'<option value="Overwatch">' +
 						'<option value="Super Smash Bros. Melee Singles">' +
 						'<option value="Super Smash Bros. Melee Doubles">' +
-						'<option value="Overwatch">' +
 					'</datalist>'
 				);
 
@@ -323,10 +392,12 @@ function displayModule(overlayID, doc){
 							'<button class="btn btn-light element-settings-button" data-element="casterTag1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTag1" placeholder="Caster Tag">' +
 						'</div>' +
+						'<button class="btn btn-primary switch" data-target1="casterTag1" data-target2="casterTag2" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<div class="flex-container flex-wide">' +
 							'<button class="btn btn-light element-settings-button" data-element="casterTag2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTag2" placeholder="Caster Tag">' +
 						'</div>' +
+						'<button class="btn btn-primary switch" data-target1="casterTag2" data-target2="casterTag3" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<div class="flex-container flex-wide">' +
 							'<button class="btn btn-light element-settings-button" data-element="casterTag3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTag3" placeholder="Caster Tag">' +
@@ -337,16 +408,20 @@ function displayModule(overlayID, doc){
 							'<button class="btn btn-light element-settings-button" data-element="casterTwitter1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTwitter1" placeholder="Caster Twitter">' +
 						'</div>' +
+						'<button class="btn btn-primary switch" data-target1="casterTwitter1" data-target2="casterTwitter2" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<div class="flex-container flex-wide">' +
 							'<button class="btn btn-light element-settings-button" data-element="casterTwitter2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTwitter2" placeholder="Caster Twitter">' +
 						'</div>' +
+						'<button class="btn btn-primary switch" data-target1="casterTwitter2" data-target2="casterTwitter3" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<div class="flex-container flex-wide">' +
 							'<button class="btn btn-light element-settings-button" data-element="casterTwitter3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 							'<input class="updateable flex-wide" type="text" name="casterTwitter3" placeholder="Caster Twitter">' +
 						'</div>' +
 					'</div>'
 				);
+				
+				listenElementSettings(doc.id);
 				
 				break;
 				
@@ -366,8 +441,8 @@ function displayModule(overlayID, doc){
 		displayData(overlayID, doc);
 		
 		//Add event handler to remove module
-		$('.modules').find('.remove-module').each(function(i){
-			$(this).click(function(e){
+		$('.modules').find('.remove-module').each(function(){
+			$(this).click(function(){
 				var deleteModule = confirm("Delete module: Are you sure?");
 				if (deleteModule){
 					removeModule($(this).parent().parent().parent().children('.overlay-id').val(), $(this).parent().data("moduleid"));
@@ -447,6 +522,33 @@ function displayImages(moduleid, target, storageRef, imageRef){
 function displayVersus(overlayID, module, game){
 
 	switch(game){
+		case "Generic":
+			
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="gnrc-playerLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="gnrc-playerLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="gnrc-playerLeft" placeholder="Left Player Name">' +
+						'<button class="btn btn-primary switch" data-target1="gnrc-playerLeft" data-target2="gnrc-playerRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="gnrc-playerRight" placeholder="Right Player Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="gnrc-playerRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="gnrc-playerRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="gnrc-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="gnrc-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="gnrc-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-target1="gnrc-scoreLeft" data-target2="gnrc-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable" type="number" name="gnrc-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="gnrc-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="gnrc-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
+			break;
+			
 		case 'Super Smash Bros. Melee Singles':
 			//console.log("test");
 			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
@@ -455,7 +557,7 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="melee-singles-sponsorLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-sponsorLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="melee-singles-sponsorLeft" placeholder="Left Player Sponsor">' +
-						'<button class="btn btn-primary switch" data-target1="melee-singles-sponsorLeft" data-target2="melee-singles-sponsorRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-sponsorLeft" data-target2="melee-singles-sponsorRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="melee-singles-sponsorRight" placeholder="Right Player Sponsor">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-sponsorRight"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="melee-singles-sponsorRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -464,28 +566,28 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="melee-singles-playerLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-playerLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="melee-singles-playerLeft" placeholder="Left Player Tag">' +
-						'<button class="btn btn-primary switch" data-target1="melee-singles-playerLeft" data-target2="melee-singles-playerRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-playerLeft" data-target2="melee-singles-playerRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="melee-singles-playerRight" placeholder="Right Player Tag">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-playerRight"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="melee-singles-playerRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 					'</div>' +
 					'<div class="flex-container flex-center full-width ">' + //Characters
-						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charLeft"><i class="fas fa-eye"></i></i></button>' +
-						'<img class="dynamic-image melee-char" data-target="melee-singles-charLeft">' +
-						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charLeft">' +
-						'<button class="btn btn-primary switch" data-target1="melee-singles-charLeft" data-target2="melee-singles-charRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
-						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charRight">' +
-						'<img class="dynamic-image melee-char" data-target="melee-singles-charRight">' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charRight"><i class="fas fa-eye"></i></i></button>' +
-						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="melee-singles-charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-charLeft-img" data-target2="melee-singles-charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="melee-char" data-storage-ref="melee-char" name="melee-singles-charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="melee-singles-charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="melee-singles-charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 					'</div>' +
 					'<div class="flex-container flex-center full-width ">' + //Port
 						'<button class="btn btn-light element-settings-button" data-element="melee-singles-portLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-portLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<label>Port</label>' +
 						'<input class="updateable" type="number" name="melee-singles-portLeft" size="2" value="0" min="1" max="4">' +
-						'<button class="btn btn-primary switch" data-target1="melee-singles-portLeft" data-target2="melee-singles-portRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-portLeft" data-target2="melee-singles-portRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable" type="number" name="melee-singles-portRight" size="2" value="1" min="1" max="4">' +
 						'<label>Port</label>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-portRight"><i class="fas fa-eye"></i></i></button>' +
@@ -496,7 +598,7 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<label>Score</label>' +
 						'<input class="updateable" type="number" name="melee-singles-scoreLeft" size="2" value="1" min="0" max="2">' +
-						'<button class="btn btn-primary switch" data-target1="melee-singles-scoreLeft" data-target2="melee-singles-scoreRight" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-target1="melee-singles-scoreLeft" data-target2="melee-singles-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable" type="number" name="melee-singles-scoreRight" size="2" value="0" min="0" max="2">' +
 						'<label>Score</label>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="melee-singles-scoreRight"><i class="fas fa-eye"></i></i></button>' +
@@ -525,7 +627,7 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="ow-teamLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-teamLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="ow-teamLeft" placeholder="Left Team Name">' +
-						'<button class="btn btn-primary switch" data-switch="team" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-switch="team" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable flex-wide" type="text" name="ow-teamRight" placeholder="Right Team Name">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-teamRight"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="ow-teamRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -534,7 +636,7 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="ow-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
 						'<input class="updateable" type="number" name="ow-scoreLeft" size="2" value="0" min="0">' +
-						'<button class="btn btn-primary switch" data-switch="score" type="button"><i class="fas fa-sync-alt"></i></button>' +
+						'<button class="btn btn-primary switch" data-switch="score" type="button"><i class="fas fa-exchange-alt"></i></button>' +
 						'<input class="updateable" type="number" name="ow-scoreRight" size="2" value="0" min="0">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="ow-scoreRight"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="ow-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -542,6 +644,33 @@ function displayVersus(overlayID, module, game){
 				'</div>'
 			);
 
+			break;
+		
+		case "EA NHL":
+			
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="nhl-playerLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="nhl-playerLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="nhl-playerLeft" placeholder="Left Player Name">' +
+						'<button class="btn btn-primary switch" data-target1="nhl-playerLeft" data-target2="nhl-playerRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="nhl-playerRight" placeholder="Right Player Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="nhl-playerRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="nhl-playerRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' +
+						'<button class="btn btn-light element-settings-button" data-element="nhl-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="nhl-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="nhl-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-target1="nhl-scoreLeft" data-target2="nhl-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable" type="number" name="nhl-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="nhl-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="nhl-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
 			break;
 	}
 	
@@ -582,13 +711,11 @@ function removeOverlay(overlayid){
 }
 
 function displayOverlay(data){
-	var dataName = data._document.data.internalValue.root.value.internalValue;
-	
 	$('.overlays').append(
-		'<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + dataName + '">' +
+		'<div class="overlay" data-overlayid="' + data.id + '" data-overlayname="' + data.data().name + '">' +
 			'<input class="overlay-id" type="hidden" value="' + data.id + '">' +
 			'<div class="flex-container full-width">' +
-				'<h3 class="overlay-name">' + dataName + '</h3>' +
+				'<h3 class="overlay-name">' + data.data().name + '</h3>' +
 			'</div>' +
 			'<p><b>Overlay Link:</b> <a class="link" target="_blank" href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a> <button type="button" class="btn btn-light copy-clip"><i class="fas fa-clipboard"></i></button></p>' +
 			'<div class="modules"></div>' +

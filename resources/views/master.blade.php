@@ -64,6 +64,7 @@
 						</button>
 					</div>
 					<div class="modal-body">
+						<div class=""></div>
 						<h4>Transform</h4>
 						<div class="full-width">
 							{{Form::label('Anchor')}}
