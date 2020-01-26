@@ -6,6 +6,17 @@
 var uid = $('meta[name="uid"]').attr('data');
 var overlayid = $('meta[name="overlayid"]').attr('data');
 
+/*--------------
+//General Functions
+--------------*/
+
+//Function to replace text nodes and only text nodes of a selector
+jQuery.fn.textNodes = function() {
+  return this.contents().filter(function() {
+    return (this.nodeType === Node.TEXT_NODE && this.nodeValue.trim() !== "");
+  });
+}
+
 //Animations JSON
 var animationArray = {
 	"none": {
@@ -48,15 +59,29 @@ function displayModule(doc){
 					if(game.exists){
 						
 						switch(game.data().value){
+							case 'Generic':
+								$("body").append(
+									'<div class="module" data-moduleid="' + doc.id + '">' +
+										'<p class="element" style="" data-element="gnrc-playerLeft"></p>' +
+										'<p class="element" style="" data-element="gnrc-playerRight"></p>' +
+										'<p class="element" style="" data-element="gnrc-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="gnrc-scoreRight"></p>' +
+									'</div>'
+								);
+								
+								break;
+								
 							case 'Super Smash Bros. Melee Singles':
 								$("body").append(
 									'<div class="module" data-moduleid="' + doc.id + '">' +
-										'<p class="element" style="" data-element="melee-playerLeft"><span data-element="melee-sponsorLeft"></span></p>' +
-										'<p class="element" style="" data-element="melee-playerRight"><span data-element="melee-sponsorRight"></span></p>' +
-										'<p class="element" style="" data-element="melee-portLeft"></p>' +
-										'<p class="element" style="" data-element="melee-portRight"></p>' +
-										'<p class="element" style="" data-element="melee-scoreLeft"></p>' +
-										'<p class="element" style="" data-element="melee-scoreRight"></p>' +
+										'<p class="element" style="" data-element="melee-singles-playerLeft"><span class="element" style="" data-element="melee-singles-sponsorLeft"></span></p>' +
+										'<p class="element" style="" data-element="melee-singles-playerRight"><span class="element" style="" data-element="melee-singles-sponsorRight"></span></p>' +
+										'<img class="element dynamic-image" data-list="melee-char" data-element="melee-singles-charLeft-img">' +
+										'<img class="element dynamic-image" data-list="melee-char" data-element="melee-singles-charRight-img">' +
+										'<p class="element" style="" data-element="melee-singles-portLeft"></p>' +
+										'<p class="element" style="" data-element="melee-singles-portRight"></p>' +
+										'<p class="element" style="" data-element="melee-singles-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="melee-singles-scoreRight"></p>' +
 									'</div>'
 								);
 								
@@ -73,6 +98,18 @@ function displayModule(doc){
 								);
 								
 								break;
+								
+							case 'EA NHL':
+								$("body").append(
+									'<div class="module" data-moduleid="' + doc.id + '">' +
+										'<p class="element" style="" data-element="nhl-teamLeft"></p>' +
+										'<p class="element" style="" data-element="nhl-teamRight"></p>' +
+										'<p class="element" style="" data-element="nhl-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="nhl-scoreRight"></p>' +
+									'</div>'
+								);
+								
+								break;
 						}
 						
 						//Data event Listener
@@ -82,11 +119,28 @@ function displayModule(doc){
 				
 				break;
 			
-			//Lower-thirds
+			//Text
 			case 'text':
 				$("body").append(
 					'<div class="module" data-moduleid="' + doc.id + '">' +
 						'<p class="element" style="" data-element="text"></p>' +
+					'</div>'
+				);
+				
+				dataChange(doc);
+				
+				break;
+				
+			//Casters
+			case 'casters':
+				$("body").append(
+					'<div class="module" data-moduleid="' + doc.id + '">' +
+						'<p class="element" style="" data-element="casterTag1"></p>' +
+						'<p class="element" style="" data-element="casterTwitter1"></p>' +
+						'<p class="element" style="" data-element="casterTag2"></p>' +
+						'<p class="element" style="" data-element="casterTwitter2"></p>' +
+						'<p class="element" style="" data-element="casterTag2"></p>' +
+						'<p class="element" style="" data-element="casterTwitter2"></p>' +
 					'</div>'
 				);
 				
@@ -103,6 +157,8 @@ function displayModule(doc){
 					'</div>'
 				);
 				
+				dataChange(doc);
+				
 				break;
 		}
 		
@@ -111,6 +167,36 @@ function displayModule(doc){
 	}
 }
 
+function playVideo(module, element, freezeFrame, delay, duration) {
+	var myVideo = $(document).find(".module[data-moduleid=" + module + "] video.element[data-element=" + element + "]");
+	var videoLength = myVideo.length;
+
+	//console.log(videoLength);
+	for (var i = 0; i < videoLength; i++){
+		myVideo.get(i).load();
+		myVideo.get(i).pause();
+	}
+
+	setTimeout(function(){
+		for (var j = 0; j < videoLength; j++){
+			myVideo.get(j).play();
+		}
+
+		setTimeout(function(){
+			for (var k = 0; k < videoLength; k++){
+				myVideo.get(k).pause();
+			}
+
+			setTimeout(function(){
+				//if(myVideo.paused){
+					for (var h = 0; h < videoLength; h++){
+						myVideo.get(h).play();
+					}
+				//}
+			}, duration);
+		}, freezeFrame);
+	}, delay);
+}
 /*--------------
 //Event Listeners
 --------------*/
@@ -119,6 +205,10 @@ function dataChange(doc){
 		let changes = snapshot.docChanges();
 		//console.log(changes);
 		changes.forEach(change =>{
+			
+			/*--------------
+			//Style Changes
+			--------------*/
 			var style = {
 				"height": change.doc.data().height,
 				"width": change.doc.data().width,
@@ -179,22 +269,83 @@ function dataChange(doc){
 				$.extend(style,arrayCSS);
 			}
 			
-			//console.log(animationArray[change.doc.data().animationIn]);
+			/*--------------
+			//Specific Value Cases
+			--------------*/
+			var value;
 			
+			switch(change.doc.id){
+				case 'melee-singles-sponsorLeft':
+				case 'melee-singles-sponsorRight':
+				case 'melee-doubles-teamLeft-sponsor1':
+				case 'melee-doubles-teamLeft-sponsor2':
+				case 'melee-doubles-teamRight-sponsor1':
+				case 'melee-doubles-teamRight-sponsor2':
+					value = change.doc.data().value + ' | ';
+					break;
+				default:
+					value = change.doc.data().value;
+					break;
+			}
+			
+			/*--------------
+			//Apply Changes
+			--------------*/
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").delay(change.doc.data().delayOut).animate(animationArray[change.doc.data().animationOut], change.doc.data().durationOut);
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").removeAttr("style");
-			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").text(change.doc.data().value);
+			
+			//Background Webm
+			if(change.doc.data().userUpload){
+				$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").wrap('<div class="element" data-element="' + change.doc.id + '"></div>');
+				//Retrieve webm from storage
+				firebase.storage().ref(change.doc.data().userUpload).getDownloadURL().then(function(url) {
+					$(".module[data-moduleid=" + doc.id + "] div.element[data-element=" + change.doc.id + "]").prepend(
+						'<video class="video" muted="muted">' +
+							'<source src="' + url + '">' + //height="' + change.doc.data() + '" width="' + + '"
+						'</video>'
+					);	
+				}).catch(function(error) {
+					console.log("Error retrieving from storage: " + error);
+				});		
+			}
+			
+			//Make changes to text nodes without changing children
+			if($(".module[data-moduleid=" + doc.id + "] p.element[data-element=" + change.doc.id + "]").children().length > 0){
+				var children = $(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").children();
+				$(".module[data-moduleid=" + doc.id + "] p.element[data-element=" + change.doc.id + "]").text(value);
+				$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").prepend(children);
+			} else if (change.doc.id.includes("img")) {
+				var storageRef = $(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").attr("data-list");
+				
+				//Retrieve image from storage
+				firebase.storage().ref(storageRef + '/' + value + '.png').getDownloadURL().then(function(url) {
+					$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").attr('src',url);
+				}).catch(function(error) {
+					console.log("Error retrieving from storage: " + error);
+				});
+			} else {
+				$(".module[data-moduleid=" + doc.id + "] p.element[data-element=" + change.doc.id + "]").text(value);
+			}
+			
+			//Apply CSS
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").css(style);
 			
 			if(!$('link[href="https://fonts.googleapis.com/css?family=' + change.doc.data().font + '"]').length && change.doc.data().font !== undefined) {
-				$("head").append(
-					'<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=' + change.doc.data().font +'">'
-				);
+				try{
+					$("head").append(
+						'<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=' + change.doc.data().font +'">'
+					);
+				} catch (err) {
+					console.log("Font application error: " + err);
+				}
 			} else {
-				console.log("font already linked");
+				console.log("Font " + change.doc.data().font + " already linked");
 			}
 			
 			$(".module[data-moduleid=" + doc.id + "] .element[data-element=" + change.doc.id + "]").delay(change.doc.data().delayIn).animate(animationArray[change.doc.data().animationIn], change.doc.data().durationIn);
+			
+			//Play video
+			playVideo(doc.id, change.doc.id, change.doc.data().webmFreeze, change.doc.data().webmdelay, change.doc.data().webmduration);
 		});
 	});
 }

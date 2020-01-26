@@ -17,6 +17,7 @@
 				<ul class="nav navbar-nav">
 					<!-- <li><a href="{{ route('dashboard') }}">Dashboard</a></li> -->
 					<li>{{ Form::open(['route' => 'login', 'method' => 'POST', 'class' => 'logout-form']) }}{!! Form::hidden('tokenID') !!}{!! Form::button('Logout', ['class' => 'btn btn-primary logout']) !!}{{ Form::close() }}</li>
+					<li>{!! Form::button('Media Files', ['class' => 'btn btn-secconday media', 'data-toggle' => 'modal', 'data-target' => "#media"]) !!}</li>
 					<li>{!! Form::button('Update', ['class' => 'btn btn-primary update']) !!}</li>
 				</ul>
 				@endif
@@ -28,6 +29,32 @@
 				@yield('content')
 			</div><!--.container-->
 		</section>
+		
+		<div class="modal fade" id="media" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Add Module</h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<h4>Upload</h4>
+						<progress value="0" max="100" id="upload-progress"></progress><p id="upload-text">0%</p>
+						{{Form::file('file_upload', ['id' => 'upload-button'])}}
+						
+						<br><br>
+						<h4>Media List</h4>
+						<ul id="media-list">		
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
 		
 		<div class="modal fade" id="add-module" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -64,7 +91,6 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						<div class=""></div>
 						<h4>Transform</h4>
 						<div class="full-width">
 							{{Form::label('Anchor')}}
@@ -124,13 +150,15 @@
 						<br>
 						<h4>Background Webm</h4>
 						<div class="full-width">
-						{{Form::file('file_name')}}
-						{{Form::label('FreezeFrame (ms)')}}
-						{{Form::text('webmFreeze', null, ['class' => 'element-setting full-width'])}}
-						{{Form::label('Duration (ms)')}}
-						{{Form::text('webmduration', null, ['class' => 'element-setting full-width'])}}
-						{{Form::label('Delay (ms)')}}
-						{{Form::text('webmdelay', null, ['class' => 'element-setting full-width'])}}
+							{{Form::text('userUpload', null, ['class' => 'element-setting full-width', 'list' => 'user-uploads'])}}
+							<datalist id="user-uploads">
+							</datalist>
+							{{Form::label('FreezeFrame (ms)')}}
+							{{Form::text('webmFreeze', null, ['class' => 'element-setting full-width'])}}
+							{{Form::label('Duration (ms)')}}
+							{{Form::text('webmduration', null, ['class' => 'element-setting full-width'])}}
+							{{Form::label('Delay (ms)')}}
+							{{Form::text('webmdelay', null, ['class' => 'element-setting full-width'])}}
 						</div>
 						
 						<br>
