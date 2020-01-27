@@ -26,6 +26,7 @@ $(document).ready(function(){
 window.$ = window.jQuery = require('jquery');//Hack to prevent jQuery errors on custom Bootstrap functions
 //window.Popper = require('popper.js');//Don't remember why this was included
 require('bootstrap');
+require('textfit');
 require('./firebase-auth.js');
 require('./dashboard.js');
 require('./overlay.js');

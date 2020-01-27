@@ -370,3 +370,5 @@ $("overlay-program").ready(function(){//Initialize Event Listeners
 		});
 	}
 });
+
+textFit(document.getElementsByClassName('element'), {minFontSize:10, maxFontSize: 50});

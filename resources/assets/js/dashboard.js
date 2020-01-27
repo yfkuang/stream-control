@@ -343,9 +343,15 @@ function displayModule(overlayID, doc){
 					'<datalist id="games-list">' +
 						'<option value="Generic">' +
 						'<option value="EA NHL">' +
+						'<option value="FGC">' +
 						'<option value="Overwatch">' +
+						'<option value="Pokken">' +
 						'<option value="Super Smash Bros. Melee Singles">' +
 						'<option value="Super Smash Bros. Melee Doubles">' +
+						'<option value="Super Smash Bros. Melee Crews">' +
+						'<option value="Super Smash Bros. Ultimate Singles">' +
+						'<option value="Super Smash Bros. Ultimate Doubles">' +
+						'<option value="Super Smash Bros. Ultimate Crews/Squad Strike">' +
 					'</datalist>'
 				);
 

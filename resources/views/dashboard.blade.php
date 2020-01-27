@@ -219,7 +219,7 @@
 									<div class="card-body">
 										<div class="flex-container">
 											{{Form::text('userUpload', null, ['class' => 'element-setting flex-wide', 'list' => 'user-uploads'])}}
-											<a target="_blank" disabled href="#" class="btn btn-primary"><i class="fas fa-eye"></i></a>
+											<a target="_blank" disabled class="btn"><i class="fas fa-eye"></i></a>
 										</div>
 										<datalist id="user-uploads">
 										</datalist>
@@ -501,5 +501,8 @@
 		<option value="zelda-green">Zelda Green</option>
 		<option value="zelda-red">Zelda Red</option>
 		<option value="zelda-white">Zelda White</option>
+	</datalist>
+	<datalist id="countries">
+		
 	</datalist>
 @stop
