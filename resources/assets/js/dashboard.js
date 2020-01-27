@@ -71,8 +71,20 @@ $('#upload-button').change(function(){
 	}, function complete(){
 		$('#upload-text').text("Upload Complete");
 		console.log(file.name + " uploaded");
+		listMediaUpload();
 	});
 });
+
+//Delete Media
+function deleteMedia(reference) {
+	reference.delete().then(function() {
+		console.log("Media file " + reference.name + " deleted");
+		listMediaUpload();
+	}).catch(function(error) {
+	  console.log("Error deleting " + reference.name + " from storage: " + error);
+	});
+	
+}
 
 //List Media
 function listMediaUpload(){
@@ -81,14 +93,30 @@ function listMediaUpload(){
 	
 	firebase.storage().ref('user_data/' + uid).listAll().then(function(result) {
 		result.items.forEach(function(item){
-			//console.log(item.name);
-			$('#media-list').append("<li>" + item.name + "</li>")
+			//console.log(item.getDownloadURL());
+			
+			//Get URL
+			item.getDownloadURL().then(function(url) {
+				$('#media-list').append('<tr class="flex-container full-width"><td><a target="_blank" href="' + url + '" class="btn btn-primary"><i class="fas fa-eye"></i></a></td><td class="flex-wide">&nbsp;' + item.name + '</td><td><button class="btn btn-danger btn-media-delete" data-fullpath="' + item.fullPath + '" type="button"><i class="fas fa-trash"></i></button></td></tr>');
+				
+				//Event Listener for Delete Media 
+				$('.btn-media-delete[data-fullpath="' + item.fullPath + '"]').click(function(){
+					//console.log(item.fullPath);
+					deleteMedia(item);
+				});
+
+				
+			}).catch(function(error) {
+				console.log("Error retrieving from storage: " + error);
+			});
 		});
 	}).catch(function(error) {
 		console.log("Storage retrieval error: " + error);
 	});
+	
 }
 
+//List Media Event Listener
 $('.media').click(function(){
 	listMediaUpload();
 });

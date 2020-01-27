@@ -62,6 +62,10 @@ section.content {
 	overflow-y: scroll;
 }
 
+.card-header{
+	cursor: pointer;
+}
+
 //Overlays
 .overlay{
 	box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
