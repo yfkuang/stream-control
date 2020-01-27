@@ -16,7 +16,7 @@ button{
 	margin: 5px;
 }
 
-input[type=text], input[type=password], input[type=number], input[list]{
+input[type=text], input[type=password], input[type=number], input[list], select, label{
 	margin: 5px;
 	padding: 5px;
 	font-size: 12pt;
@@ -56,14 +56,25 @@ section.content {
 	padding: 100px 0 40px 0;
 }
 
+//Forms
+.form-control, .custom-select{
+	border: 1px solid #a1a1a1;
+}
+
 //Modal
 .modal-body{
-	max-height: 500px;
+	max-height: 85vh;
 	overflow-y: scroll;
 }
 
 .card-header{
 	cursor: pointer;
+}
+
+@media (min-width: 576px){
+	.modal-dialog{
+		max-width: 50vw;
+	}
 }
 
 //Overlays
@@ -170,6 +181,10 @@ a {
 
 .flex-center{
 	justify-content: center;
+}
+
+.add-gutter-margin{
+	margin-right: 5px;
 }
 
 .flex-wide{

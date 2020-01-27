@@ -95,83 +95,168 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						<h4>Transform</h4>
-						<div class="full-width">
-							{{Form::label('Anchor')}}
-							{{Form::select('anchor', array('topLeft' => 'Top Left', 'topRight' => 'Top Right', 'botLeft' => 'Bottom Left', 'botRight' => 'Bottom Right'), null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Position X')}}
-							{{Form::text('x', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Position Y')}}
-							{{Form::text('y', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Width')}}
-							{{Form::text('width', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Height')}}
-							{{Form::text('height', null, ['class' => 'element-setting full-width'])}}
+						<div id="elementAccordion">
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse1">
+									<h4>Transform</h4>
+								</div><!--.card-header-->
+								<div id="elementCollapse1" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										{{Form::label('Anchor')}}
+										{{Form::select('anchor', array('topLeft' => 'Top Left', 'topRight' => 'Top Right', 'botLeft' => 'Bottom Left', 'botRight' => 'Bottom Right'), null, ['class' => 'element-setting full-width custom-select'])}}
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Position X')}}
+												{{Form::text('x', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Position Y')}}
+												{{Form::text('y', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Width')}}
+												{{Form::text('width', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Height')}}
+												{{Form::text('height', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse2">
+									<h4>Text</h4>
+								</div>
+								<div id="elementCollapse2" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										{{Form::label('Font')}}
+										<input class="element-setting full-width" name="font" list="font-list" placeholder="Select a font">
+										<datalist id="font-list">
+											@foreach(App\Http\Controllers\FontController::getFonts() as $font)
+												<option value='<?php echo $font; ?>'>
+											@endforeach
+										</datalist>
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Text Size')}}
+												{{Form::text('fontSize', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Font Weight')}}
+												{{Form::text('fontWeight', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Letter Spacing')}}
+												{{Form::text('letterSpace', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Text Align')}}
+												{{Form::select('textAlign', array('right' => 'Right', 'center' => 'Center', 'left' => 'Left'), null, ['class' => 'element-setting full-width custom-select'])}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse3">
+									<h4>Animation In</h4>
+								</div>
+								<div id="elementCollapse3" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Animation')}}
+												{{Form::select('animationIn', array('none' => 'None', 'fadeIn' => 'Fade In', 'fadeInFromLeft' => 'Fade In From Left', 'fadeInFromRight' => 'Fade In From Right'), null, ['class' => 'element-setting full-width custom-select'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Duration (ms)')}}
+												{{Form::text('durationIn', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Delay (ms)')}}
+												{{Form::text('delayIn', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse4">
+									<h4>Animation Out</h4>
+								</div>								
+								<div id="elementCollapse4" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Animation')}}
+												{{Form::select('animationOut', array('none' => 'None', 'fadeOut' => 'Fade Out', 'fadeOutToLeft' => 'Fade Out To Left', 'fadeoutToRight' => 'Fade Out To Right'), null, ['class' => 'element-setting full-width custom-select'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Duration (ms)')}}
+												{{Form::text('durationOut', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Delay (ms)')}}
+												{{Form::text('delayIn', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse5">
+									<h4>Background Webm</h4>
+								</div>
+								<div id="elementCollapse5" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										<div class="flex-container">
+											{{Form::text('userUpload', null, ['class' => 'element-setting flex-wide', 'list' => 'user-uploads'])}}
+											<a target="_blank" disabled href="#" class="btn btn-primary"><i class="fas fa-eye"></i></a>
+										</div>
+										<datalist id="user-uploads">
+										</datalist>
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('FreezeFrame (ms)')}}
+												{{Form::text('webmFreeze', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Duration (ms)')}}
+												{{Form::text('webmduration', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Delay (ms)')}}
+												{{Form::text('webmdelay', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="card">
+								<div class="card-header" data-toggle="collapse" data-target="#elementCollapse6">
+									<h4>Additional CSS</h4>
+								</div>
+								<div id="elementCollapse6" class="collapse" data-parent="#elementAccordion">
+									<div class="card-body">
+										{{Form::textarea('css', null, ['placeholder' => 'CSS', 'class' => 'element-setting full-width form-control'])}}
+									</div>
+								</div>
+							</div>
 						</div>
 						
-						<br>
-						<h4>Text</h4>
-						<div class="full-width">
-							{{Form::label('Font')}}
-							<input class="element-setting full-width" name="font" list="font-list" placeholder="Select a font">
-							<datalist id="font-list">
-								@foreach(App\Http\Controllers\FontController::getFonts() as $font)
-									<option value='<?php echo $font; ?>'>
-								@endforeach
-							</datalist>
-							{{Form::label('Text Size')}}
-							{{Form::text('fontSize', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Font Weight')}}
-							{{Form::text('fontWeight', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Letter Spacing')}}
-							{{Form::text('letterSpace', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Text Align')}}
-							{{Form::select('textAlign', array('right' => 'Right', 'center' => 'Center', 'left' => 'Left'), null, ['class' => 'element-setting full-width'])}}
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+							<button type="button" class="btn btn-success element-setting-apply" data-dismiss="modal">Apply</button>
 						</div>
-						
-						<br>
-						<h4>Animation In</h4>
-						<div class="full-width">
-							{{Form::label('Animation')}}
-							{{Form::select('animationIn', array('none' => 'None', 'fadeIn' => 'Fade In', 'fadeInFromLeft' => 'Fade In From Left', 'fadeInFromRight' => 'Fade In From Right'), null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Duration (ms)')}}
-							{{Form::text('durationIn', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Delay (ms)')}}
-							{{Form::text('delayIn', null, ['class' => 'element-setting full-width'])}}
-						</div>
-						
-						<br>
-						<h4>Animation Out</h4>
-						<div class="full-width">
-							{{Form::label('Animation')}}
-							{{Form::select('animationOut', array('none' => 'None', 'fadeOut' => 'Fade Out', 'fadeOutToLeft' => 'Fade Out To Left', 'fadeoutToRight' => 'Fade Out To Right'), null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Duration (ms)')}}
-							{{Form::text('durationOut', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Delay (ms)')}}
-							{{Form::text('delayOut', null, ['class' => 'element-setting full-width'])}}
-						</div>
-						
-						<br>
-						<h4>Background Webm</h4>
-						<div class="full-width">
-							{{Form::text('userUpload', null, ['class' => 'element-setting full-width', 'list' => 'user-uploads'])}}
-							<datalist id="user-uploads">
-							</datalist>
-							{{Form::label('FreezeFrame (ms)')}}
-							{{Form::text('webmFreeze', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Duration (ms)')}}
-							{{Form::text('webmduration', null, ['class' => 'element-setting full-width'])}}
-							{{Form::label('Delay (ms)')}}
-							{{Form::text('webmdelay', null, ['class' => 'element-setting full-width'])}}
-						</div>
-						
-						<br>
-						<h4>Additional CSS</h4>
-						{{Form::textarea('css', null, ['placeholder' => 'CSS', 'class' => 'element-setting full-width'])}}
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-success element-setting-apply" data-dismiss="modal">Apply</button>
 					</div>
 				</div>
 			</div>
