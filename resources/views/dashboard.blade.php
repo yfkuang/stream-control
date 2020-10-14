@@ -77,6 +77,7 @@
 						{{Form::button('<i class="fas fa-align-left"></i> Lower-Thirds', ['class' => 'btn btn-default module-button col-xs-4 add-lower-thirds', 'data-type' => 'lower-thirds', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="far fa-clock"></i> Timer', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'timer', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="fas fa-chart-bar"></i> Chart', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'chart', 'data-dismiss' => 'modal'])}}
+						{{Form::button('<i class="fas fa-people-arrows"></i> Head-to-Head', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'head-to-head', 'data-dismiss' => 'modal'])}}
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -155,8 +156,18 @@
 												{{Form::text('letterSpace', null, ['class' => 'element-setting full-width form-control'])}}
 											</div>
 											<div class="full-width add-gutter-margin">
+												{{Form::label('Color')}}
+												{{Form::color('color', null, ['class' => 'element-setting full-width form-control'])}}
+											</div>
+										</div>
+										<div class="flex-container">
+											<div class="full-width add-gutter-margin">
+												{{Form::label('Text Transform')}}
+												{{Form::select('textTransform', array('none' => 'None', 'uppercase' => 'Uppercase', 'lowercase' => 'Lowercase', 'capitalize' => 'Capitalize'), null, ['class' => 'element-setting full-width custom-select'])}}
+											</div>
+											<div class="full-width add-gutter-margin">
 												{{Form::label('Text Align')}}
-												{{Form::select('textAlign', array('right' => 'Right', 'center' => 'Center', 'left' => 'Left'), null, ['class' => 'element-setting full-width custom-select'])}}
+												{{Form::select('textAlign', array('left' => 'Left', 'center' => 'Center', 'right' => 'Right'), null, ['class' => 'element-setting full-width custom-select'])}}
 											</div>
 										</div>
 									</div>
@@ -501,6 +512,36 @@
 		<option value="zelda-green">Zelda Green</option>
 		<option value="zelda-red">Zelda Red</option>
 		<option value="zelda-white">Zelda White</option>
+	</datalist>
+	<datalist id="opse_schools">
+		<option value="cambrian_logo">Cambrian</option>
+		<option value="carleton_logo">Carleton</option>
+		<option value="concordia_logo">Concordia</option>
+		<option value="conestoga_logo">Conestoga</option>
+		<option value="fanshawe_logo">Fanshawe</option>
+		<option value="lambton_logo">Lambton</option>
+		<option value="queens_logo">Queens</option>
+		<option value="ryerson_logo">Ryerson</option>
+		<option value="sault_logo">Sault</option>
+		<option value="stclair_logo">St-Clair</option>
+		<option value="tent_logo">Trent</option>
+		<option value="uoft_logo">U of T</option>
+		<option value="uoft_logo">University of Toronto</option>
+		<option value="uottawa_logo">uOttawa</option>
+		<option value="uottawa_logo">Univeristy of Ottawa</option>
+		<option value="waterloo_logo">Waterloo</option>
+		<option value="western_logo">Western</option>
+		<option value="windsor_logo">Windsor</option>
+		<option value="york_logo">York (on light bg)</option>
+		<option value="york_alt_logo">York (on dark bg)</option>
+	</datalist>
+	<datalist id="hearthstone_classes">
+		<option value="demon_hunter">Demon Hunter</option>
+		<option value="druid">Druid</option>
+		<option value="hunter">Hunter</option>
+		<option value="mage">Mage</option>
+		<option value="paladin">Paladin</option>
+		<option value="priest">Priest</option>
 	</datalist>
 	<datalist id="countries">
 		

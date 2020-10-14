@@ -96,6 +96,30 @@ function displayModule(doc){
 										'<p class="element" style="" data-element="ow-scoreRight"></p>' +
 									'</div>'
 								);
+							
+							case 'OPSE':
+								$("body").append(
+									'<div class="module" data-moduleid="' + doc.id + '">' +
+										'<p class="element" style="" data-element="opse-teamLeft"></p>' +
+										'<p class="element" style="" data-element="opse-teamRight"></p>' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charLeft-img">' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charRight-img">' +
+										'<p class="element" style="" data-element="opse-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="opse-scoreRight"></p>' +
+									'</div>'
+								);
+								
+							case 'OPSE Hearthstone':
+								$("body").append(
+									'<div class="module" data-moduleid="' + doc.id + '">' +
+										'<p class="element" style="" data-element="opse-teamLeft"></p>' +
+										'<p class="element" style="" data-element="opse-teamRight"></p>' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charLeft-img">' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charRight-img">' +
+										'<p class="element" style="" data-element="opse-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="opse-scoreRight"></p>' +
+									'</div>'
+								);
 								
 								break;
 								
@@ -160,6 +184,36 @@ function displayModule(doc){
 				dataChange(doc);
 				
 				break;
+				
+			case 'timer':
+				$("body").append(
+					'<div class="module" data-moduleid="' + doc.id + '">' +
+						'<p class="element" style="" data-element="timer" id="time"></p>' +
+					'</div>'
+				);
+				
+				dataChange(doc);
+				
+				break;
+				
+			case 'head-to-head':
+				$("body").append(
+					'<div class="module" data-moduleid="' + doc.id + '">' +
+						'<img class="element dynamic-image" data-list="opse_schools" data-element="charLeft-img">' +
+						'<img class="element dynamic-image" data-list="opse_schools" data-element="charRight-img">' +
+					'</div>'
+				);
+				
+				for(i = 0; i < doc.data().nameCount; i++){
+					$(".module[data-moduleid=" + doc.id + "]").append(
+						'<p class="element" style="" data-element="h2h-playerLeft-' + i + '"></p>' +
+						'<p class="element" style="" data-element="h2h-playerRight-' + i + '"></p>'
+					);
+				}
+				
+				dataChange(doc);
+
+				break;
 		}
 		
 		//Data event Listener
@@ -197,6 +251,32 @@ function playVideo(module, element, freezeFrame, delay, duration) {
 		}, freezeFrame);
 	}, delay);
 }
+
+function startTimer(duration, display, startingText) {
+	var timer = duration, minutes, seconds;
+	
+	for (var i = 0; i < 99; i++){
+		window.clearInterval(i);
+	}
+	
+	var interval = window.setInterval(function () {
+		minutes = parseInt(timer / 60, 10);
+		seconds = parseInt(timer % 60, 10);
+
+		minutes = minutes < 10 ?  minutes : minutes;
+		seconds = seconds < 10 ? "0" + seconds : seconds;
+
+		display.text(minutes + ":" + seconds);
+		
+		if (--timer < 0) {
+			//timer = duration;
+			display.text(startingText);
+			$('.element[data-element=waitingText]').hide();
+			clearInterval(interval);
+		}
+	}, 1000);
+}
+
 /*--------------
 //Event Listeners
 --------------*/
@@ -204,6 +284,7 @@ function dataChange(doc){
 	firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayid).collection("modules").doc(doc.id).collection("elements").onSnapshot(snapshot => {
 		let changes = snapshot.docChanges();
 		//console.log(changes);
+		
 		changes.forEach(change =>{
 			
 			/*--------------
@@ -216,6 +297,8 @@ function dataChange(doc){
 				"font-family": change.doc.data().font,
 				"font-weight": change.doc.data().fontWeight,
 				"letter-spacing": change.doc.data().letterSpace,
+				"color": change.doc.data().color,
+				"text-transform": change.doc.data().textTransform,
 				"text-align": change.doc.data().textAlign,
 			}
 			
@@ -282,6 +365,19 @@ function dataChange(doc){
 				case 'melee-doubles-teamRight-sponsor1':
 				case 'melee-doubles-teamRight-sponsor2':
 					value = change.doc.data().value + ' | ';
+					break;
+				case 'timer':
+					value = change.doc.data().value + ':00';
+					display = $('#time');
+					firebase.firestore().collection('users').doc(uid).collection("overlays").doc(overlayid).collection("modules").doc(doc.id).collection("elements").doc("startingText").get().then(function (doc) {
+						if (doc.exists) {
+							startTimer(change.doc.data().value * 60, $('#time'), doc.data().value);
+						} else {
+							console.log("Starting text not set!");
+						}
+					}).catch(function(error) {
+						console.log("Error getting timer starting text:", error);
+					});
 					break;
 				default:
 					value = change.doc.data().value;
@@ -371,4 +467,4 @@ $("overlay-program").ready(function(){//Initialize Event Listeners
 	}
 });
 
-textFit(document.getElementsByClassName('element'), {minFontSize:10, maxFontSize: 50});
+//textFit(document.getElementsByClassName('element'), {minFontSize:10, maxFontSize: 50});

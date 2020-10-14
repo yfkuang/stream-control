@@ -283,17 +283,37 @@ function listenToggle(overlayID, module){
 
 //Listen Switch Button
 function listenSwitch(moduleid) {
-	$('.switch').each(function() {
+	//console.log("added switches for" + moduleid)
+	$('.module[data-moduleid=' + moduleid + '] .switch').each(function() {
+		//console.log($(this));
+		
 		$(this).click(function(){
+			//console.log('test');
 			var target1 = $(this).attr('data-target1');
 			var target2 = $(this).attr('data-target2');
-			var target1Value = $('.updateable[name=' + target1 + ']').val();
-			var target2Value = $('.updateable[name=' + target2 + ']').val();
+			var target1Value = $('.module[data-moduleid=' + moduleid + '] .updateable[name=' + target1 + ']').val();
+			var target2Value = $('.module[data-moduleid=' + moduleid + '] .updateable[name=' + target2 + ']').val();
 
-			$('.updateable[name=' + target1 + ']').val(target2Value);
-			$('.updateable[name=' + target2 + ']').val(target1Value);
+			$('.module[data-moduleid=' + moduleid + '] .updateable[name=' + target1 + ']').val(target2Value);
+			$('.module[data-moduleid=' + moduleid + '] .updateable[name=' + target2 + ']').val(target1Value);
 
 			console.log('Switched ' + target1 + " and " + target2);
+		});
+	});
+}
+
+//Listen add name count Button for head-to-head
+function listenAddNameCount(overlayid, module) {
+	$('.addNameCount').each(function() {
+		$(this).click(function(){
+			newNameCount = module.data().nameCount + 1;
+			
+			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(module.id).update({
+				nameCount: newNameCount,
+			}).then(function(){
+				console.log('Added Names to ' + module.id + '. Name Count: ' + nameCount);
+			});
+			
 		});
 	});
 }
@@ -305,11 +325,21 @@ function addModule(overlayid, overlayName, type){
 	var newModule = makeid() + '-' + type;
 	console.log('New module added to ' + overlayid + ' (' + overlayName + '): ' + newModule);
 	
-	// Write new Module to overlay's 'modules' collection
-	firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(newModule).set({
-		type: type,
-	});
-
+	switch(type){
+		case 'head-to-head':
+			// Write new Module to overlay's 'modules' collection
+			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(newModule).set({
+				type: type,
+				nameCount: 1,
+			});
+			break;
+		default:
+			// Write new Module to overlay's 'modules' collection
+			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(newModule).set({
+				type: type,
+			});
+			break;
+	}
 }
 
 function removeModule(overlayid,moduleID){
@@ -345,6 +375,8 @@ function displayModule(overlayID, doc){
 						'<option value="EA NHL">' +
 						'<option value="FGC">' +
 						'<option value="Overwatch">' +
+						'<option value="OPSE">' +
+						'<option value="OPSE Hearthstone">' +
 						'<option value="Pokken">' +
 						'<option value="Super Smash Bros. Melee Singles">' +
 						'<option value="Super Smash Bros. Melee Doubles">' +
@@ -370,8 +402,8 @@ function displayModule(overlayID, doc){
 			case 'text':
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
 					'<div class="flex-container full-width">' +
-						'<input class="updateable flex-wide" type="text" name="text" placeholder="Text">' +
 						'<button class="btn btn-light element-settings-button" data-element="text" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="text" placeholder="Text">' +
 					'</div>'
 				);
 				
@@ -460,6 +492,103 @@ function displayModule(overlayID, doc){
 				break;
 				
 			case 'timer'://Timer
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<div class="flex-container full-width">' +
+						'<label>Text After Timer Ends</label>' +
+						'<button class="btn btn-light element-settings-button" data-element="startingText" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="startingText" placeholder="Text After Timer Ends">' +
+					'</div>' +
+					'<div class="flex-container full-width">' +
+						'<label>Time in Minutes</label>' +
+						'<button class="btn btn-light element-settings-button" data-element="timer" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<input class="updateable flex-wide" type="number" name="timer" placeholder="Time in minutes">' +
+					'</div>'
+				);
+				
+				listenElementSettings(doc.id);
+				
+				break;
+				
+			case 'head-to-head'://Head-to-head
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<div class="flex-container flex-center full-width ">' + //School Logo
+						'<button class="btn btn-light element-settings-button" data-element="charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="charLeft-img" data-target2="charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>'
+				);
+				
+				for(i = 0; i < doc.data().nameCount; i++){
+					$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
+					'<div class="flex-container full-width ">' + //Player tag
+						'<button class="btn btn-light element-settings-button" data-element="h2h-playerLeft-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerLeft-' + i + '"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="h2h-playerLeft-' + i + '" placeholder="Left Player Tag ' + i + '">' +
+						'<button class="btn btn-primary switch" data-target1="h2h-playerLeft-' + i + '" data-target2="h2h-playerRight-' + i + '" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="h2h-playerRight-' + i + '" placeholder="Right Player Tag ' + i + '">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerRight-' + i + '"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="h2h-playerRight-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>'
+					);
+				}
+				
+				$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
+				'<div class="flex-container full-width flex-center">' + //Increase Count
+					'<button class="btn btn-success addNameCount" type="button"><i class="fas fa-plus"></i></button>' +
+				'</div>'
+				);
+				
+				listenAddNameCount(overlayID, doc);
+				listenElementSettings(doc.id);
+				
+				//listen to switch buttons
+				listenSwitch(doc.id);
+				
+				break;
+			
+			case 'Ban and Pick'://Ban and Pick
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<div class="flex-container flex-center full-width ">' + //School Logo
+						'<button class="btn btn-light element-settings-button" data-element="charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="charLeft-img" data-target2="charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>'
+				);
+				
+				for(i = 0; i < doc.data().nameCount; i++){
+					$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
+					'<div class="flex-container full-width ">' + //Player tag
+						'<button class="btn btn-light element-settings-button" data-element="h2h-playerLeft-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerLeft-' + i + '"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="h2h-playerLeft-' + i + '" placeholder="Left Player Tag ' + i + '">' +
+						'<button class="btn btn-primary switch" data-target1="h2h-playerLeft-' + i + '" data-target2="h2h-playerRight-' + i + '" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="h2h-playerRight-' + i + '" placeholder="Right Player Tag ' + i + '">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerRight-' + i + '"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="h2h-playerRight-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>'
+					);
+				}
+				
+				$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
+				'<div class="flex-container full-width flex-center">' + //Increase Count
+					'<button class="btn btn-success addNameCount" type="button"><i class="fas fa-plus"></i></button>' +
+				'</div>'
+				);
+				
+				listenAddNameCount(overlayID, doc);
+				listenElementSettings(doc.id);
 				
 				
 				break;
@@ -640,9 +769,6 @@ function displayVersus(overlayID, module, game){
 					'</div>' +
 				'</div>'
 			);
-			
-			//listen to switch buttons
-			listenSwitch(module.id);
 
 			break;
 
@@ -678,6 +804,99 @@ function displayVersus(overlayID, module, game){
 				'</div>'
 			);
 
+			break;
+			
+		case 'OPSE':
+			//console.log("test");
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' + //School Name
+						'<button class="btn btn-light element-settings-button" data-element="opse-teamLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-teamLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-teamLeft" placeholder="Left Team Name">' +
+						'<button class="btn btn-primary switch" data-target1="opse-teamLeft" data-target2="opse-teamRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-teamRight" placeholder="Right Team Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-teamRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-teamRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //School Logo
+						'<button class="btn btn-light element-settings-button" data-element="opse-charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="opse-charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="opse-charLeft-img" data-target2="opse-charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="opse-charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Score
+						'<button class="btn btn-light element-settings-button" data-element="opse-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="opse-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-target1="opse-scoreLeft" data-target2="opse-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable" type="number" name="opse-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
+			//listen to switch buttons
+			listenSwitch(module.id);
+			
+			break;
+			
+		case 'OPSE Hearthstone':
+			//console.log("test");
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' + //School Name
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-teamLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-teamLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-hs-teamLeft" placeholder="Left Team Name">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-teamLeft" data-target2="opse-hs-teamRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-hs-teamRight" placeholder="Right Team Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-teamRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-teamRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //School Logo
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse-hs_schools" name="opse-hs-charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-charLeft-img" data-target2="opse-hs-charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse-hs_schools" name="opse-hs-charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-classLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="opse-hs_schools" name="opse-hs-classLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-classLeft-img" data-target2="opse-hs-classRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="opse-hs_schools" name="opse-hs-classRight-img">' +
+						'<img class="dynamic-image melee-class" data-target="opse-hs-classRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Score
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="opse-hs-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-scoreLeft" data-target2="opse-hs-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable" type="number" name="opse-hs-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
+			//listen to switch buttons
+			listenSwitch(module.id);
+			
 			break;
 		
 		case "EA NHL":
@@ -751,7 +970,7 @@ function displayOverlay(data){
 			'<div class="flex-container full-width">' +
 				'<h3 class="overlay-name">' + data.data().name + '</h3>' +
 			'</div>' +
-			'<p><b>Overlay Link:</b> <a class="link" target="_blank" href="http://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a> <button type="button" class="btn btn-light copy-clip"><i class="fas fa-clipboard"></i></button></p>' +
+			'<p><b>Overlay Link:</b> <a class="link" target="_blank" href="https://control.streamland.ca/' + uid + '/' + data.id + '">' + 'control.streamland.ca/' + uid + '/' + data.id + '</a> <button type="button" class="btn btn-light copy-clip"><i class="fas fa-clipboard"></i></button></p>' +
 			'<div class="modules"></div>' +
 			'<button class="btn btn-primary add-module" type="button" data-toggle="modal" data-target="#add-module"><i class="fas fa-plus-circle"></i> Add Module</button>' +
 			'<button class="btn btn-danger remove-overlay" type="button"><i class="fas fa-trash-alt"></i> Remove Overlay</button>' +
