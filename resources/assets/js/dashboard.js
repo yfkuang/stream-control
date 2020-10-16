@@ -171,7 +171,7 @@ function listenElementSettings(moduleid){
 				var element = $(this).attr('data-element');
 				var overlayid = $(this).parents('.overlay').attr('data-overlayid');
 				var moduleid = $(this).parents('.module').attr('data-moduleid');
-
+				
 				$('.element-setting').each(function(){
 					$(this).attr('data-element', element);
 					$(this).attr('data-overlayid', overlayid);
@@ -302,8 +302,8 @@ function listenSwitch(moduleid) {
 	});
 }
 
-//Listen add name count Button for head-to-head
-function listenAddNameCount(overlayid, module) {
+//Listen add and minus name count Button for head-to-head
+function listenNameCount(overlayid, module) {
 	$('.addNameCount').each(function() {
 		$(this).click(function(){
 			newNameCount = module.data().nameCount + 1;
@@ -311,10 +311,34 @@ function listenAddNameCount(overlayid, module) {
 			firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(module.id).update({
 				nameCount: newNameCount,
 			}).then(function(){
-				console.log('Added Names to ' + module.id + '. Name Count: ' + nameCount);
+				console.log('Added Names to ' + module.id + '. Name Count: ' + newNameCount);
 			});
 			
 		});
+	});
+	
+	$('.minusNameCount').each(function() {//decrease name count
+		$(this).click(function(){
+			if(module.data().nameCount > 0) {
+				newNameCount = module.data().nameCount - 1;
+			
+				firebase.firestore().collection('users').doc(uid).collection('overlays').doc(overlayid).collection('modules').doc(module.id).update({
+					nameCount: newNameCount,
+				}).then(function(){
+					console.log('Removed Names to ' + module.id + '. Name Count: ' + newNameCount);
+				});
+			}
+			
+		});
+	});
+}
+
+//Reset Winning deck for hearthstone pick and ban
+function listenResetPickAndBan() {
+	$('.resetPickBan').each(function() {
+		radioButton = $('input[name=' + $(this).attr('data-target') + ']');
+		radioButton.attr('checked',false);
+		console.log('radio test');
 	});
 }
 
@@ -377,6 +401,7 @@ function displayModule(overlayID, doc){
 						'<option value="Overwatch">' +
 						'<option value="OPSE">' +
 						'<option value="OPSE Hearthstone">' +
+						'<option value="OPSE Rocket League">' +
 						'<option value="Pokken">' +
 						'<option value="Super Smash Bros. Melee Singles">' +
 						'<option value="Super Smash Bros. Melee Doubles">' +
@@ -541,10 +566,11 @@ function displayModule(overlayID, doc){
 				$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
 				'<div class="flex-container full-width flex-center">' + //Increase Count
 					'<button class="btn btn-success addNameCount" type="button"><i class="fas fa-plus"></i></button>' +
+					'<button class="btn btn-danger minusNameCount" type="button"><i class="fas fa-minus"></i></button>' +
 				'</div>'
 				);
 				
-				listenAddNameCount(overlayID, doc);
+				listenNameCount(overlayID, doc);
 				listenElementSettings(doc.id);
 				
 				//listen to switch buttons
@@ -552,44 +578,109 @@ function displayModule(overlayID, doc){
 				
 				break;
 			
-			case 'Ban and Pick'://Ban and Pick
+			case 'hearthstone-ban-and-pick'://Ban and Pick
 				$('.module[data-moduleid=' + doc.id + '] h4').after(
-					'<div class="flex-container flex-center full-width ">' + //School Logo
-						'<button class="btn btn-light element-settings-button" data-element="charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="charLeft-img"><i class="fas fa-eye"></i></i></button>' +
-						'<img class="dynamic-image melee-char" data-target="charLeft-img">' +
-						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charLeft-img">' +
-						'<button class="btn btn-primary switch" data-target1="charLeft-img" data-target2="charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
-						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="charRight-img">' +
-						'<img class="dynamic-image melee-char" data-target="charRight-img">' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="charRight-img"><i class="fas fa-eye"></i></i></button>' +
-						'<button class="btn btn-light element-settings-button" data-element="charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'<div class="flex-container full-width flex-center">' +
+						'<h5>Picks</h5>' +
+					'</div>' +
+					'<div class="flex-container full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="pickLeft-img-1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickLeft-img-1"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="pickLeft-img-1">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickLeft-img-1">' +
+						'<button class="btn btn-primary switch" data-target1="pickLeft-img-1" data-target2="pickRight-img-1" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickRight-img-1">' +
+						'<img class="dynamic-image melee-class" data-target="pickRight-img-1">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickRight-img-1"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="pickRight-img-1" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container full-width flex-center">' + //win
+						'<input type="radio" class="updateable" name="pick-win-1" value="right">' +
+						'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Winning Deck?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+						'<input type="radio" class="updateable" name="pick-win-1" value="left">' +
+					'</div>' +
+					'<div class="flex-container full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="pickLeft-img-2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickLeft-img-2"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="pickLeft-img-2">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickLeft-img-2">' +
+						'<button class="btn btn-primary switch" data-target1="pickLeft-img-2" data-target2="pickRight-img-2" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickRight-img-2">' +
+						'<img class="dynamic-image melee-class" data-target="pickRight-img-2">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickRight-img-2"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="pickRight-img-2" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container full-width flex-center">' + //win
+						'<input type="radio" class="updateable" name="pick-win-2" value="left">' +
+						'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Winning Deck?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+						'<input type="radio" class="updateable" name="pick-win-2" value="right">' +
+					'</div>' +
+					'<div class="flex-container full-width flex-center">' +
+						"<input class='btn btn-light resetPickBan' type='button' value='Reset' data-target='pick-win-2'>" +
+					'</div>' +
+					'<div class="flex-container full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="pickLeft-img-3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickLeft-img-3"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="pickLeft-img-3">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickLeft-img-3">' +
+						'<button class="btn btn-primary switch" data-target1="pickLeft-img-3" data-target2="pickRight-img-3" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="pickRight-img-3">' +
+						'<img class="dynamic-image melee-class" data-target="pickRight-img-3">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="pickRight-img-3"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="pickRight-img-3" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container full-width flex-center">' + //win
+						'<input type="radio" class="updateable" name="pick-win-3" value="left">' +
+						'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Winning Deck?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+						'<input type="radio" class="updateable" name="pick-win-3" value="right">' +
+					'</div>' +
+					'<div class="flex-container full-width flex-center">' +
+						'<h5>Bans</h5>' +
+					'</div>' +
+					'<div class="flex-container full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="banLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="banLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="banLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="banLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="banLeft-img" data-target2="banRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="banRight-img">' +
+						'<img class="dynamic-image melee-class" data-target="banRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="banRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="banRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 					'</div>'
 				);
 				
-				for(i = 0; i < doc.data().nameCount; i++){
-					$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
-					'<div class="flex-container full-width ">' + //Player tag
-						'<button class="btn btn-light element-settings-button" data-element="h2h-playerLeft-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerLeft-' + i + '"><i class="fas fa-eye"></i></i></button>' +
-						'<input class="updateable flex-wide" type="text" name="h2h-playerLeft-' + i + '" placeholder="Left Player Tag ' + i + '">' +
-						'<button class="btn btn-primary switch" data-target1="h2h-playerLeft-' + i + '" data-target2="h2h-playerRight-' + i + '" type="button"><i class="fas fa-exchange-alt"></i></button>' +
-						'<input class="updateable flex-wide" type="text" name="h2h-playerRight-' + i + '" placeholder="Right Player Tag ' + i + '">' +
-						'<button class="btn btn-light toggle-hide" type="button" data-element="h2h-playerRight-' + i + '"><i class="fas fa-eye"></i></i></button>' +
-						'<button class="btn btn-light element-settings-button" data-element="h2h-playerRight-' + i + '" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
-					'</div>'
-					);
-				}
+				//listen reset pick ban buttons
+				listenResetPickAndBan();
 				
-				$('.module[data-moduleid=' + doc.id + '] .module-content-end').before(
-				'<div class="flex-container full-width flex-center">' + //Increase Count
-					'<button class="btn btn-success addNameCount" type="button"><i class="fas fa-plus"></i></button>' +
-				'</div>'
-				);
+				//listen to switch buttons
+				listenSwitch(doc.id);
 				
-				listenAddNameCount(overlayID, doc);
 				listenElementSettings(doc.id);
 				
+				break;
+				
+			case 'image'://Image
+				$('.module[data-moduleid=' + doc.id + '] h4').after(
+					'<input class="updateable full-width" name="imageType" list="image-type-list" placeholder="Select an image category">' +
+					'<datalist id="image-type-list">' +
+						'<option value="User Media">' +
+						'<option value="melee-char">Super Smash Bros. Melee Characters</option>' +
+						'<option value="opse_schools">OPSE Schools</option>' +
+						'<option value="hearthstone_classes">Hearthstone Classes</option>' +
+						'<option value="lol_positions">League of Legends Positions</option>' +
+					'</datalist>'
+				);
+				
+				//display appropriate inputs on list value (image-type) change
+				$('.module[data-moduleid=' + doc.id + '] .updateable[name=imageType]').change(function(){
+					var imageType = $(this).val();
+					
+					console.log(doc.id + " image type changed to " + imageType);
+					$('.module[data-moduleid=' + doc.id + ']  .imageType').remove();
+					
+					displayImageType(overlayID, doc, imageType);
+				});
 				
 				break;
 		}
@@ -634,6 +725,11 @@ function displayData(overlayID, doc){
 								displayVersus(overlayID, doc, element.data().value);
 								
 								break;
+							case 'imageType':
+								$(this).val(element.data().value);
+								displayImageType(overlayID, doc, element.data().value);
+								
+								break;
 								
 							default:
 							   $(this).val(element.data().value);
@@ -670,7 +766,7 @@ function displaySettings(overlayID, moduleid, element){
 
 //Function for getting dynamic images in Firebase storage
 function displayImages(moduleid, target, storageRef, imageRef){
-	$('.dynamic-image[data-target=' + target + ']').each(function() {
+	$('.module[data-moduleid=' + moduleid +'] .dynamic-image[data-target=' + target + ']').each(function() {
 		var img = $(this);
 		
 		firebase.storage().ref(storageRef + '/' + imageRef + '.png').getDownloadURL().then(function(url) {
@@ -864,9 +960,9 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charLeft-img"><i class="fas fa-eye"></i></i></button>' +
 						'<img class="dynamic-image melee-char" data-target="opse-hs-charLeft-img">' +
-						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse-hs_schools" name="opse-hs-charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-hs-charLeft-img">' +
 						'<button class="btn btn-primary switch" data-target1="opse-hs-charLeft-img" data-target2="opse-hs-charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
-						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse-hs_schools" name="opse-hs-charRight-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-hs-charRight-img">' +
 						'<img class="dynamic-image melee-char" data-target="opse-hs-charRight-img">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charRight-img"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -875,9 +971,61 @@ function displayVersus(overlayID, module, game){
 						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classLeft-img"><i class="fas fa-eye"></i></i></button>' +
 						'<img class="dynamic-image melee-char" data-target="opse-hs-classLeft-img">' +
-						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="opse-hs_schools" name="opse-hs-classLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="opse-hs-classLeft-img">' +
 						'<button class="btn btn-primary switch" data-target1="opse-hs-classLeft-img" data-target2="opse-hs-classRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
-						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="opse-hs_schools" name="opse-hs-classRight-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="opse-hs-classRight-img">' +
+						'<img class="dynamic-image melee-class" data-target="opse-hs-classRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Score
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-scoreLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-scoreLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable" type="number" name="opse-hs-scoreLeft" size="2" value="0" min="0">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-scoreLeft" data-target2="opse-hs-scoreRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable" type="number" name="opse-hs-scoreRight" size="2" value="0" min="0">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-scoreRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-scoreRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+				'</div>'
+			);
+			
+			//listen to switch buttons
+			listenSwitch(module.id);
+			
+			break;
+			
+		case 'OPSE Rocket League':
+			//console.log("test");
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=game]').after(
+				'<div class="game" >' +
+					'<div class="flex-container full-width ">' + //School Name
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-teamLeft" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-teamLeft"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-hs-teamLeft" placeholder="Left Team Name">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-teamLeft" data-target2="opse-hs-teamRight" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide" type="text" name="opse-hs-teamRight" placeholder="Right Team Name">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-teamRight"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-teamRight" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //School Logo
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-charLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-hs-charLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-charLeft-img" data-target2="opse-hs-charRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="opse_schools" data-storage-ref="opse_schools" name="opse-hs-charRight-img">' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-charRight-img">' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-charRight-img"><i class="fas fa-eye"></i></i></button>' +
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-charRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+					'</div>' +
+					'<div class="flex-container flex-center full-width ">' + //Class Logo
+						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classLeft-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classLeft-img"><i class="fas fa-eye"></i></i></button>' +
+						'<img class="dynamic-image melee-char" data-target="opse-hs-classLeft-img">' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="opse-hs-classLeft-img">' +
+						'<button class="btn btn-primary switch" data-target1="opse-hs-classLeft-img" data-target2="opse-hs-classRight-img" type="button"><i class="fas fa-exchange-alt"></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="hearthstone_classes" data-storage-ref="hearthstone_classes" name="opse-hs-classRight-img">' +
 						'<img class="dynamic-image melee-class" data-target="opse-hs-classRight-img">' +
 						'<button class="btn btn-light toggle-hide" type="button" data-element="opse-hs-classRight-img"><i class="fas fa-eye"></i></i></button>' +
 						'<button class="btn btn-light element-settings-button" data-element="opse-hs-classRight-img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
@@ -942,6 +1090,39 @@ function displayVersus(overlayID, module, game){
 	
 }
 
+//Function for displaying appropriate inputs on list value (game category) change
+function displayImageType(overlayID, module, imageType){
+
+	switch(imageType){
+		case "lol_positions": //League of legends positions
+			$('.overlay[data-overlayid=' + overlayID + '] .module[data-moduleid=' + module.id + '] .updateable[name=imageType]').after(
+				'<div class="imageType" >' +
+					'<div class="flex-container flex-center full-width ">' + //League position
+						'<button class="btn btn-light element-settings-button" data-element="img" type="button" data-toggle="modal" data-target="#element-settings"><i class="fas fa-cog"></i></button>' +
+						'<button class="btn btn-light toggle-hide" type="button" data-element="img"><i class="fas fa-eye"></i></i></button>' +
+						'<input class="updateable flex-wide dynamic-image-target" list="lol_positions" data-storage-ref="lol_positions" name="img">' +
+						'<img class="dynamic-image melee-char" data-target="img">' +
+					'</div>' +
+				'</div>'
+			);
+			
+			break;
+			
+	}
+	
+	//listen to element settings buttons
+	listenElementSettings(module.id);
+	
+	//display appropriate inputs on inputs with dynamic images
+	$('.module[data-moduleid=' + module.id + '] .dynamic-image-target').change(function(){
+		var imageRef = $(this).val();
+		var storageRef = $(this).attr('data-storage-ref');
+		var target = $(this).attr('name');
+		
+		displayImages(module.id,target,storageRef,imageRef);
+	});
+}
+
 /*--------------
 //Overlay Functions
 --------------*/
@@ -959,8 +1140,6 @@ function removeOverlay(overlayid){
 	}).catch(function(error) {
 		console.error("Error removing overlay" + overlayid + ": ", error);
 	});
-	
-	/*Add delete modules afterwards*/
 }
 
 function displayOverlay(data){

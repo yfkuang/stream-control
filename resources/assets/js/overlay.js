@@ -112,12 +112,14 @@ function displayModule(doc){
 							case 'OPSE Hearthstone':
 								$("body").append(
 									'<div class="module" data-moduleid="' + doc.id + '">' +
-										'<p class="element" style="" data-element="opse-teamLeft"></p>' +
-										'<p class="element" style="" data-element="opse-teamRight"></p>' +
-										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charLeft-img">' +
-										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-charRight-img">' +
-										'<p class="element" style="" data-element="opse-scoreLeft"></p>' +
-										'<p class="element" style="" data-element="opse-scoreRight"></p>' +
+										'<p class="element" style="" data-element="opse-hs-teamLeft"></p>' +
+										'<p class="element" style="" data-element="opse-hs-teamRight"></p>' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-hs-charLeft-img">' +
+										'<img class="element dynamic-image" data-list="opse_schools" data-element="opse-hs-charRight-img">' +
+										'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="opse-hs-classLeft-img">' +
+										'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="opse-hs-classRight-img">' +
+										'<p class="element" style="" data-element="opse-hs-scoreLeft"></p>' +
+										'<p class="element" style="" data-element="opse-hs-scoreRight"></p>' +
 									'</div>'
 								);
 								
@@ -212,6 +214,39 @@ function displayModule(doc){
 				}
 				
 				dataChange(doc);
+
+				break;
+				
+			case 'hearthstone-ban-and-pick':
+				$("body").append(
+					'<div class="module" data-moduleid="' + doc.id + '">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickLeft-img-1">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickRight-img-1">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickLeft-img-2">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickRight-img-2">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickLeft-img-3">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="pickRight-img-3">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="banLeft-img">' +
+						'<img class="element dynamic-image" data-list="hearthstone_classes" data-element="banRight-img">' +
+					'</div>'
+				);
+				
+				dataChange(doc);
+
+				break;
+				
+			case 'image':
+				doc.ref.collection("elements").doc("imageType").get().then(function(imageType){
+					if(imageType.exists){
+						$("body").append(
+							'<div class="module" data-moduleid="' + doc.id + '">' +
+								'<img class="element dynamic-image" data-list="' + imageType.data().value + '" data-element="img">' +
+							'</div>'
+						);
+						
+						dataChange(doc);
+					}
+				});
 
 				break;
 		}
@@ -340,16 +375,15 @@ function dataChange(doc){
 				$.extend(style,position);
 			}
 			
-			if(change.doc.data().css){
-				var addCSS = change.doc.data().css.replace('\n','').split(';');
-				var arrayCSS = {};
+			if(change.doc.data().css){//Additional CSS
+				styleElement = document.createElement('style');
+				if($('style[data-element=' + change.doc.id + ']')){
+				   $('style[data-element=' + change.doc.id + ']').remove();
+				}
 				
-				addCSS.forEach(function(property){
-					var propertyArray = property.split(':');
-					arrayCSS[propertyArray[0]] = propertyArray[1];
-				});
-				
-				$.extend(style,arrayCSS);
+				styleElement.textContent = '.module[data-moduleid=' + doc.id + '] .element[data-element=' + change.doc.id + ']{' + change.doc.data().css + '}';
+				styleElement.setAttribute('data-element', change.doc.id);
+				$('body').append(styleElement);
 			}
 			
 			/*--------------
@@ -378,6 +412,18 @@ function dataChange(doc){
 					}).catch(function(error) {
 						console.log("Error getting timer starting text:", error);
 					});
+					break;
+				case 'pick-win-1':
+				case 'pick-win-2':
+				case 'pick-win-3':
+					switch (change.doc.data().value){
+						case 'left':
+							$('.element[data-element=pickLeft-img-1]').style.filter = "dropshadow(0px 0px 15px rgba(146, 255, 110, 0.5))";
+							break;
+						case 'right':
+							$('.element[data-element=pickRight-img-1]').style.filter = "dropshadow(0px 0px 15px rgba(146, 255, 110, 0.5))";
+							break;
+					}
 					break;
 				default:
 					value = change.doc.data().value;

@@ -78,6 +78,8 @@
 						{{Form::button('<i class="far fa-clock"></i> Timer', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'timer', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="fas fa-chart-bar"></i> Chart', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'chart', 'data-dismiss' => 'modal'])}}
 						{{Form::button('<i class="fas fa-people-arrows"></i> Head-to-Head', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'head-to-head', 'data-dismiss' => 'modal'])}}
+						{{Form::button('<i class="fas fa-hand-pointer"></i> Hearthstone Ban and Pick', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'hearthstone-ban-and-pick', 'data-dismiss' => 'modal'])}}
+						{{Form::button('<i class="fas fa-image"></i> Image', ['class' => 'btn btn-default module-button col-xs-4 add-timer', 'data-type' => 'image', 'data-dismiss' => 'modal'])}}
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -542,6 +544,19 @@
 		<option value="mage">Mage</option>
 		<option value="paladin">Paladin</option>
 		<option value="priest">Priest</option>
+		<option value="rogue">Rogue</option>
+		<option value="shaman">Shaman</option>
+		<option value="warlock">Warlock</option>
+		<option value="warrior">Warrior</option>
+	</datalist>
+	<datalist id="lol_positions">
+		<option value="top_lane_icon">Top</option>
+		<option value="jun_lane_icon">Jungler</option>
+		<option value="mid_lane_icon">Mid</option>
+		<option value="bot_lane_icon">Bot</option>
+		<option value="bot_lane_icon">ADC</option>
+		<option value="bot_lane_icon">AD Carry</option>
+		<option value="sup_lane_icon">Support</option>
 	</datalist>
 	<datalist id="countries">
 		
